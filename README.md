@@ -1,3 +1,7 @@
+ <p align="center">
+<img src="Grafici%20github/50.png" width="350" height="200"/> 
+ </p>
+
 Table of contents
 -----------
 1. [ Preface ](#desc)
