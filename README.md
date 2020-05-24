@@ -1,4 +1,4 @@
-Table of Contents
+Table of contents
 -----------
 1. [ Preface. ](#desc)
 2. [ Descriptive Analysis. ](#usage)
