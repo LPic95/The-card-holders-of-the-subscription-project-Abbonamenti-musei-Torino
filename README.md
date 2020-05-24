@@ -13,6 +13,7 @@ The primary aim of this text is to analyze the behavior of holders of the museum
 The single subscription, as internet domain reported, has its origin in 1995 with a beginning valid ticket in 4 Civic museums. Since the first year of experimentation, the affiliated museum sites have been implemented, offering increasing opportunities and focusing on the "cherz-soi" tourist experience, through a continuous updating of the cultural landscape. The real growth in numerical terms, not without stationary periods, is attested starting from 2003 (going from 30,000 units up to over 100,000 in 2014), until representing up to 12% of the total number of visits. This market did not experience relevant slowdowns- due to the economic crisis- and it has been constantly modernized thanks to frequent qualitative and quantitative surveys.
 Descriptive analysis, random and predictive modeling are the means by which this report will focus on card renewal.
 </p>
+
 <a name="usage"></a>
 Descriptive Analysis
 ------------------
