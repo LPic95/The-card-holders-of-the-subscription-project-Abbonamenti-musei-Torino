@@ -1,5 +1,5 @@
  <p align="center">
-<img src="Grafici%20github/50.png" width="350" height="200"/> 
+<img src="Pictures%20and%20Graphs/First_page.png" width="350" height="200"/> 
  </p>
 
 Table of contents
