@@ -184,6 +184,7 @@ Furthermore the observation of the codes also let us identify some other areas (
  <p align="center">
 <img src="Pictures%20and%20Graphs/Comparison%20between%20clusters%20by%20discount%20and%20number%20of%20visits.png" > 
  </p>  
+ ...
  
  <p align="center">
 <img src="Pictures%20and%20Graphs/Comparison%20between%20clusters%20by%20gender%20and%20churn.png" > 
