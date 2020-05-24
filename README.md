@@ -100,8 +100,7 @@ Self-Organising Maps
 -----------
 <p align="justify">
 The last methodology that will be used for our descriptive purposes is a non-parametric model with unsupervised learning: the Self-Organising Maps. The iterative algorithm has the ability to capture, through a two-dimensional neuronal structure, the non-linear relations between variables keeping however the topological order.
-1 The aim of implementing Self Organising Maps in this context is to be able to segment consumers,
-verifying whether the first relationships, detected at the descriptive level, can be confirmed. To obtain a sufficient degree of convergence 1000 interactions were chosen and a number of clusters equal to 4 was assumed. Being an unsupervised learning model, this preference was made on the basis of graphic considerations (codes), together with the outcome of the Ward method.
+The aim of implementing Self Organising Maps in this context is to be able to segment consumers <a href="#note1" id="note1ref"><sup>1</sup></a>, verifying whether the first relationships, detected at the descriptive level, can be confirmed. To obtain a sufficient degree of convergence 1000 interactions were chosen and a number of clusters equal to 4 was assumed. Being an unsupervised learning model, this preference was made on the basis of graphic considerations (codes), together with the outcome of the Ward method.
 </p>
 **FIGURE 13**
 
@@ -112,7 +111,5 @@ Linked to this graph, the "U-matrix" is analysed with the intent of showing the 
 </p>
 
 
- Bla bla <sup id="a1">[1](#f1)</sup>
-Then from within the footnote, link back to it.
 
-<b id="f1">1</b> In a similar way to the application shown by Rawan Ghnemat and Edward Jaser in the paper "Classification of Mobile Customers Behavior and Usage Patterns using Self-Organizing Neural Networks", International Journal of Interactive Mobile Technologies, Volume 9, Issue 4, 2015. [↩](#a1)
+<a id="note1" href="#note1ref"><sup>1</sup></a>In a similar way to the application shown by Rawan Ghnemat and Edward Jaser in the paper "Classification of Mobile Customers Behavior and Usage Patterns using Self-Organizing Neural Networks", International Journal of Interactive Mobile Technologies, Volume 9, Issue 4, 2015.
