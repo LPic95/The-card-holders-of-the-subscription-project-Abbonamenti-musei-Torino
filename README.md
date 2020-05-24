@@ -114,8 +114,15 @@ The map of the province of Turin shows the number of cumulated entries per Cap a
 <img src="Pictures%20and%20Graphs/Distribution%20of%20churn%20relative%20frequencies%20in%20Turin.png" height="300"> 
  </p> 
  
- **e tabella**
- 
+
+ | Cap   	| Number of card owners 	| Number of renewal 	| Prob. of churn 	|
+|-------	|-----------------------	|-------------------	|----------------	|
+| 10151 	| 703                   	| 482               	| 0.3143670      	|
+| 10148 	| 435                   	| 294               	| 0.324138       	|
+| 10131 	| 886                   	| 692               	| 0.218961       	|
+| 10145 	| 615                   	| 468               	| 0.239024       	|
+
+  
 <p align="justify">
 This assumption is even confirmed if we consider the centre-north areas, such as Barriera di Milano, Borgo Vittoria, San Salvario and Quadrilatero; the highest rate of dropp off is seen here. Borgo Po and Campidoglio are, on the contrary, the areas with the lowest probability; this result, unlike what could be suggested, does not only depend on the absolute number of members (as can be seen from the adjacent comparative table). The four areas listed above are the most likely to churn and renew with the respective number of members. It is noteworthy that the areas closest to the museum sites show the highest number of abandonments too, despite the fact that these are the zones with the highest real estate evaluation per square meter (although weak, this is the only proxy for income, given that the profession variable is not usable).
 </p>
