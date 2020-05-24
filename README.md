@@ -97,7 +97,7 @@ The above bar chart shows the discount variable, at first defined by 24 levels a
 The distribution of visits does not seem to differ on weekdays between those who renew and do not: however there is a slight variation on weekends and in particular those who renew the subscription tend to visit more museum sites on weekends with significant distribution on Fridays and Saturdays (in addition to differing even on less common days such as Wednesdays and Thursdays in favour of those who renew the card). 
 </p>
 
-**FIGURE MAPPE ACCANTO**
+<img src="Pictures%20and%20Graphs/Representation%20of%20the%20territorial%20distribution%20of%20museum%20card%20holders%20in%20Northern%20Italy.png" width="520" height="400"/> <img src="Pictures%20and%20Graphs/Representation%20of%20the%20territorial%20distribution%20of%20museum%20card%20holders%20in%20the%20city%20of%20Turin.png" width="350" height="300"/> 
 
 <p align="justify">
 A quick inspection of the distribution by Cap of the subscribers allows us to conclude that this effect can be analyzed especially in the Turin hinterland and, for this reason, we focus on the Turin Cap because of the highest number of members. The most numerous members are concentrated in the Mirafiori area (North), Borgo San Paolo and Pozzo Strada. It is curious to note that the most central areas such as San Donato and Quadrilatero, despite their great proximity to the museum sites, in absolute terms show the lowest number of members.
