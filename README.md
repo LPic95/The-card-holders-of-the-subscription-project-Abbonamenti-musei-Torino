@@ -98,9 +98,34 @@ Most of the reported "rules” highlights visits to close-located museums, espec
 <a name="usa"></a>
 Self-Organising Maps
 -----------
-
+<p align="justify">
 The last methodology that will be used for our descriptive purposes is a non-parametric model with unsupervised learning: the Self-Organising Maps. The iterative algorithm has the ability to capture, through a two-dimensional neuronal structure, the non-linear relations between variables keeping however the topological order.
 1 The aim of implementing Self Organising Maps in this context is to be able to segment consumers ,
 verifying whether the first relationships, detected at the descriptive level, can be confirmed. To obtain a sufficient degree of convergence 1000 interactions were chosen and a number of clusters equal to 4 was assumed. Being an unsupervised learning model, this preference was made on the basis of graphic considerations (codes), together with the outcome of the Ward method.
-
+</p>
 **FIGURE 13**
+<p align="justify">
+The graph shows the number of observations "captured" by each neuron and the areas with higher density. In this case the map is a 20x20 grid and, as can be inferred from the adjacent coloured scale; thicker areas are more frequent in the left area and, in particular, the empty neurons (in grey tones) graphically tend to delimit the distinct areas.
+Linked to this graph, the "U-matrix" is analysed with the intent of showing the distance between the identified neurons. In particular, it is evident that there are two well-defined and clearer areas; so that you can at least consider two groups, whose deep colour is inversely proportional to the distance.
+</p>
+
+:!toc:
+
+AsciidocFX shows links in PDFs as footnotes http://stackoverflow.com[SO].
+
+.Asciidoc in PDF does not work in Asciidoctor, but works in AsciidocFX.
+[cols="2,5a"]
+|===
+|Line with Asciidoc code
+|here comes a list:
+
+* item 1
+* item 2
+* item 3
+
+http://stackoverflow.com[Get Answers]!
+
+|Line
+|with a footnotefootnote:[footnotes do work in AsciidocFX's PDF output (but not in the preview).]
+
+|===
