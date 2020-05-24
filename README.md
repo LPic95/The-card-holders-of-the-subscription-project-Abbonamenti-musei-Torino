@@ -1,7 +1,7 @@
 Table of contents
 -----------
-1. [ Preface. ](#desc)
-2. [ Descriptive Analysis. ](#usage)
+1. [ Preface ](#desc)
+2. [ Descriptive Analysis ](#usage)
 
 
 
@@ -20,10 +20,10 @@ Descriptive Analysis
 The research has been carried out using 3 main datasets broadly showing personal data, information about the visits for each ID, the amounts paid and related discounts and furthermore the ID renewal.
 In addition to these socio-demographic variables (already included in the reference datasets) to highlight further relationships, the following variables have been generated:
 
-*count: number of total visits for each subscriber;
-*numero_ingressi_unici: indicator of entrances to different museums for each visitor;
-*costi_entrate: sum of the total cost that each visitor would have had to pay if he had not been a card holder; 
-*some geographical dummies to break down the territorial effect to live in the Center of Turin, in the first belt, in the second one and in the rest of the Northern Italy.
+* _count_: number of total visits for each subscriber;
+* _numero_ingressi_unici_: indicator of entrances to different museums for each visitor;
+* _costi_entrate_: sum of the total cost that each visitor would have had to pay if he had not been a card holder; 
+* _some geographical dummies_ to break down the territorial effect to live in the Center of Turin, in the first belt, in the second one and in the rest of the Northern Italy.
 
 Moreover, thanks to the study of the consumers’ joint visit through the association rules, it has been possible to consider in the descriptive analysis, the number of visits that each individual has made at least with another person (binding no less than two shared entries), the average number of people with whom each member has shared an exhibition visit and finally the number of different people with whom each subscriber has logged in. One of the first studies carried out, in terms of descriptive analysis, is related to the renewal by gender and age.
 
