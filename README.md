@@ -100,15 +100,11 @@ The distribution of visits does not seem to differ on weekdays between those who
 <img src="Pictures%20and%20Graphs/Representation%20of%20the%20territorial%20distribution%20of%20museum%20card%20holders%20in%20Northern%20Italy.png" width="520" height="400"/> <img src="Pictures%20and%20Graphs/Representation%20of%20the%20territorial%20distribution%20of%20museum%20card%20holders%20in%20the%20city%20of%20Turin.png" width="350" height="300"/> 
 
 <p align="justify">
-A quick inspection of the distribution by Cap of the subscribers allows us to conclude that this effect can be analyzed especially in the Turin hinterland and, for this reason, we focus on the Turin Cap because of the highest number of members. The most numerous members are concentrated in the Mirafiori area (North), Borgo San Paolo and Pozzo Strada. It is curious to note that the most central areas such as San Donato and Quadrilatero, despite their great proximity to the museum sites, in absolute terms show the lowest number of members.
-</p
+A quick inspection of the distribution by Cap of the subscribers allows us to conclude that this effect can be analyzed especially in the Turin hinterland and, for this reason, we focus on the Turin Cap because of the highest number of members. The most numerous members are concentrated in the Mirafiori area (North), Borgo San Paolo and Pozzo Strada. It is curious to note that the most central areas such as San Donato and Quadrilatero, despite their great proximity to the museum sites, in absolute terms show the lowest number of members.</p
 
  <p align="center">
- 
-<img src="Pictures%20and%20Graphs/Territorial%20distribution%20of%20the%20number%20of%20cumulative%20entries%20for%20Turin%20cap.png" height="300"> 
- 
- </p>
- 
+<img src="Pictures%20and%20Graphs/Territorial%20distribution%20of%20the%20number%20of%20cumulative%20entries%20for%20Turin%20cap" height="300"> 
+ </p> 
 
 <p align="justify">
 The map of the province of Turin shows the number of cumulated entries per Cap and it seems to fit perfectly with the previous results. It can therefore be concluded that the areas with the highest number of members are also those with the highest number of cumulative visits. The reading that I want to deepen now is how to distribute the relative frequencies of churn and in particular if the areas with fewer visits and members are also those with higher probability of churn.
