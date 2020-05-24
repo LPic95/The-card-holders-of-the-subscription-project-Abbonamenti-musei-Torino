@@ -151,7 +151,7 @@ where went people who visited a particular site).
 </p>
 
  <p align="center">
-<img src="Pictures%20and%20Graphs/Infographic%20representing%20the%2025%20most%20visited%20museums%20in%202013%20by%20subscribers.png" > 
+<img src="Pictures%20and%20Graphs/%20Infographic%20representing%20the%20twenty-five%20most%20visited%20museums%20in%202013%20by%20subscribers.png" > 
  </p> 
  
  <p align="center">
