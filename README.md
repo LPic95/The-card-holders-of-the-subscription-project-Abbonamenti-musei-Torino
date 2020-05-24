@@ -73,7 +73,7 @@ The density curves show how the relative distribution of the number of visits di
  </p>
  
  <p align="center">
-<img src="Pictures%20and%20Graphs/Distribution%20of%20the%20cumulative%20entry%20cost%20for%20each%20ID%20by%20comparing%20those%20who%20renew%20and%20churn.png" > 
+<img src="Pictures%20and%20Graphs/Distribution%20of%20the%20cumulative%20entry%20cost%20for%20each%20id%20by%20comparing%20those%20who%20renew%20and%20churn.png" > 
  </p>
 
  <p align="justify">
