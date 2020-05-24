@@ -137,7 +137,7 @@ Unlike other rules, this connection is bidirectional and can be interpreted with
 In line with this study, computing the list of all accesses per museum-date-every 5 minutes, the following indicators were evaluated: the number of shared entrances, the average number of people with whom card holders entered and finally the different number of accompanying people.
 </p>
 
-**FIGURE NET VICINE**
+<img src="Pictures%20and%20Graphs/Representation%20of%20the%20card%20holders%20network.png" width="520" height="400"/> <img src="Pictures%20and%20Graphs/Zoomed%20figure.png" width="350" height="300"/> 
 
  <p align="center">
 <img src="Pictures%20and%20Graphs/Distribution%20of%20the%20number%20of%20different%20people%20who%20shared%20visits%20by%20renewal (si2014).png" > 
