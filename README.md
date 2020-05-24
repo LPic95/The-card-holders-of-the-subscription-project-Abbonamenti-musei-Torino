@@ -100,11 +100,13 @@ The distribution of visits does not seem to differ on weekdays between those who
 <img src="Pictures%20and%20Graphs/Representation%20of%20the%20territorial%20distribution%20of%20museum%20card%20holders%20in%20Northern%20Italy.png" width="520" height="400"/> <img src="Pictures%20and%20Graphs/Representation%20of%20the%20territorial%20distribution%20of%20museum%20card%20holders%20in%20the%20city%20of%20Turin.png" width="350" height="300"/> 
 
 <p align="justify">
-A quick inspection of the distribution by Cap of the subscribers allows us to conclude that this effect can be analyzed especially in the Turin hinterland and, for this reason, we focus on the Turin Cap because of the highest number of members. The most numerous members are concentrated in the Mirafiori area (North), Borgo San Paolo and Pozzo Strada. It is curious to note that the most central areas such as San Donato and Quadrilatero, despite their great proximity to the museum sites, in absolute terms show the lowest number of members.</p
+A quick inspection of the distribution by Cap of the subscribers allows us to conclude that this effect can be analyzed especially in the Turin hinterland and, for this reason, we focus on the Turin Cap because of the highest number of members. The most numerous members are concentrated in the Mirafiori area (North), Borgo San Paolo and Pozzo Strada. It is curious to note that the most central areas such as San Donato and Quadrilatero, despite their great proximity to the museum sites, in absolute terms show the lowest number of members.
+</p
 
- <p align="center">
-<img src="Pictures%20and%20Graphs/Territorial%20distribution%20of%20cumulative%20entries%20for%20Turin%20cap.png" height="300"> 
- </p> 
+<p align="center">
+ <img src="Pictures%20and%20Graphs/Territorial%20distribution%20of%20cumulative%20entries%20for%20Turin%20cap.png"> 
+</p>
+
 
 <p align="justify">
 The map of the province of Turin shows the number of cumulated entries per Cap and it seems to fit perfectly with the previous results. It can therefore be concluded that the areas with the highest number of members are also those with the highest number of cumulative visits. The reading that I want to deepen now is how to distribute the relative frequencies of churn and in particular if the areas with fewer visits and members are also those with higher probability of churn.
@@ -115,14 +117,16 @@ The map of the province of Turin shows the number of cumulated entries per Cap a
  </p> 
  
 
- | Cap   	| Number of card owners 	| Number of renewal 	| Prob. of churn 	|
+ 
+| Cap   	| Number of card owners 	| Number of renewal 	| Prob. of churn 	|
 |-------	|-----------------------	|-------------------	|----------------	|
 | 10151 	| 703                   	| 482               	| 0.3143670      	|
 | 10148 	| 435                   	| 294               	| 0.324138       	|
 | 10131 	| 886                   	| 692               	| 0.218961       	|
 | 10145 	| 615                   	| 468               	| 0.239024       	|
 
-  
+
+
 <p align="justify">
 This assumption is even confirmed if we consider the centre-north areas, such as Barriera di Milano, Borgo Vittoria, San Salvario and Quadrilatero; the highest rate of dropp off is seen here. Borgo Po and Campidoglio are, on the contrary, the areas with the lowest probability; this result, unlike what could be suggested, does not only depend on the absolute number of members (as can be seen from the adjacent comparative table). The four areas listed above are the most likely to churn and renew with the respective number of members. It is noteworthy that the areas closest to the museum sites show the highest number of abandonments too, despite the fact that these are the zones with the highest real estate evaluation per square meter (although weak, this is the only proxy for income, given that the profession variable is not usable).
 </p>
