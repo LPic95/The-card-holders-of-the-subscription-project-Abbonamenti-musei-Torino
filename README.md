@@ -4,6 +4,9 @@ Table of contents
 2. [ Descriptive Analysis ](#usage)
 3. [ Association Rules ](#usag)
 4. [ Self-Organising Maps ](#usa)
+5. [ Casual Model(Logit) ](#us)
+6. [ Classification Models and Profit Lines](#u)
+
 
 <a name="desc"></a>
 Preface
@@ -132,4 +135,69 @@ Taking into account these graphical representations, we may formulate a definiti
 
 
 
+<a name="us"></a>
+
+Casual Model (Logit)
+-----------
+
+<p align="justify">
+The aim of this section is not only descriptive but causal; the purpose is to identify the variables that can explain the renewal. The model used is “logit model” and employs, as outcome, the two-level qualitative explanatory "si2014". Among the estimated coefficients, "second belt" and “index” (average number of people who entered together for each ID) are not significant. Looking at the first picture, it can be inferred that the probability of renewal increases monotonically with the number of entries. The graph shows the differences between levels of the variable residence and gender too. Both for men and women, the probability of renewal is numerically decreasing by moving away from Turin - the levels "second belt" and "elsewhere", confirming what was previously presented, do not seem to be significantly different. The probability curves between the two sexes are parallel because the study of the interaction effects did not reveal any significant coefficient between residence and gender.
+At the same level of residence women are more likely to renew than men - in line with what has been analyzed at the descriptive level - and in particular it is surprising that for all numbers of visits, women living in the rest of Northern Italy ("Elsewhere") are more likely to re-subscribe than men living in the different belts of Piedmont capital.
+</p>
+
+
+<p align="justify">
+These further charts, supporting the causal study, show the effect of both the amount paid for the subscription and the age of the members. For the first variable, the change in the price of the card has almost a linear effect on the probability, with the greatest decrease of around 4%, ceteris paribus. Differently, the age determines a visibly non-linear effect, the increase in probability is significant between 20 and 50 years, while it is much more limited in the following years.
+As already pointed out above, for these two variables there are no significant effects of interaction between gender and amount or gender and age (this consideration applies to the cap too).
+</p>
+
+<p align="justify">
+To allow such an interpretation in terms of odds ratio, the coefficients are presented as arguments of an exponential function; this choice determines the fact that they are represented on a zero plus infinite scale and the effect is increasing or not depending on whether they are higher or lower than the unit. The coefficient higher than the unit means that the variable under examination has a positive effect on the probability of renewal. In particular, the explanatory with the greatest impact is "discount"; those who benefit from the discount more than double the odds. In addition to the considerations on the variable "number of entries", it results that the "number of shared entries" and the "number of different people" have a positive effect. Therefore It can be assumed that subjects who share a passion for art and exhibitions with a large number of people and do not go alone to the museums are more likely to renew; however, only one hypothesis is not fully supported by these data because, taking into account this sample, the number of people with whom one actually goes to the museum is not significant.
+</p>
+
+<a name="u"></a>
+Classification Models and Profit Lines
+------------------------
+
+
+<p align="justify">
+The intent of this last section of the report is to identify supervised learning forecasting models that can well foresee renewals. The dataset under study has been divided into training and test sets, with proportions 70-30.
+Six models with the same variables and trained on the same “training set” are used; their performance is analyzed on the test set. To this end, are used two distinct approaches: the former of statistical nature, compares the models with classification measurements (including accuracy) while the latter is of a more economic nature. This last evaluation passes through the maximisation of profits, in the light of the costs of contacting consumers and the budget constraint set up for the direct marketing campaign.
+A first statistical comparison will be based on the realization of confusion matrix taking into account the initial threshold of 0.5.
+</p>
+<p align="justify">
+The two input tables compared show the above classes with actual values and then, given a threshold of 0.5, they will be used to estimate the accuracy of the models.
+</p>
+<p align="justify">
+All values are above the "base-rate" of the dataset of 0.70: if all visitors had been placed in the renewal group it would have obtained a measure of accuracy of 0.70. Although these models pass a first inspection, the remaining fact is that this assessment is strictly bound to a threshold.
+In order to overcome the problem, a representation in terms of Roc Curve is proposed, but it does not produce a model which totally dominates the others, and consequently let us identify the best model. These difficulties are added to the fact that, being an unbalanced distribution in the target population of si2014 variable (0.70-0.30), the measures may not be entirely reliable.
+</p>
+<p align="justify">
+Taking into account these problems, there is a need for a study that can reconcile the necessity of defining the best model with contemporary considerating costs and profits. After the "training" has been carried out and the coefficients estimated, the same coefficients are applied to obtain a probability or score of renewal for each consumer. Each model will associate to the same person (with certain individual characteristics), a differing probability.
+</p>
+
+Figure 24 shows the cumulative profits, calculated using the following formula:
+**FORMULA**
+
+<p align="justify">
+where 𝑅𝑖 indicates the revenue for the company Museums Subscriptions for each individual, 𝐶𝑖 are the costs for each individual, 𝛾𝑖 is the variable ditocomic "si2014" and finally Χ is the cost to contact members (the same for all subscribers).
+The profits for each member will be ordered, and then accumulated, on the value of the expected profit. The only difference between expected and real profit-at a formulation level- is that the latter is calculated by replacing the variable si2014 (variable label) with the score previously obtained by each model.
+The budget constraint placed at 5000 euros is represented with a vertical dotted line, and it is near this curve that it can be identified the model with the highest cumulative profit. Considering together the graph and the table, it can be inferred that the model with the best results is the Random Forest, generates a cumulative profit of 125834.2 compared to an expense of only 5000 euros.
+ </p>
+
+
+In conclusion, a further robustness analysis has been proposed to validate the data obtained.
+In particular, a problem related to the annuality of subscriptions is highlighted: the duration does not
+coincide with the calendar year but it is valid for 365 days from the day of the activation. In quantitative
+terms, this problem can be reflected by the observation of units only for short periods because of the
+fact that they have renewed the subscription in the last months of the year. A few visits are attributed
+to them, since the first months of 2014 do not appear.
+In order to bypass the problem and hypothesizing a uniform distribution of visits over the year, the data
+have been annualized <a href="#note2" id="note2ref"><sup>1</sup></a>. Finally the result confirms what has been argued so far, that is to say that the
+most performing and profitable model is the Random Forest.
+
+
+
 <a id="note1" href="#note1ref"><sup>1</sup></a>In a similar way to the application shown by Rawan Ghnemat and Edward Jaser in the paper "Classification of Mobile Customers Behavior and Usage Patterns using Self-Organizing Neural Networks", International Journal of Interactive Mobile Technologies, Volume 9, Issue 4, 2015.
+
+<a id="note2" href="#note1ref"><sup>1</sup></a> If panel data had been available, the visits could have been annualised on the basis of previous years.
