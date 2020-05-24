@@ -177,7 +177,7 @@ Taking into account these problems, there is a need for a study that can reconci
 </p>
 
 Figure 24 shows the cumulative profits, calculated using the following formula:
-**FORMULA**
+𝜋 =(𝑅 −𝐶𝑖/2)∗𝛾 −Χ
 
 <p align="justify">
 where 𝑅𝑖 indicates the revenue for the company Museums Subscriptions for each individual, 𝐶𝑖 are the costs for each individual, 𝛾𝑖 is the variable ditocomic "si2014" and finally Χ is the cost to contact members (the same for all subscribers).
