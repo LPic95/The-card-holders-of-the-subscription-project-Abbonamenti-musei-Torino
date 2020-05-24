@@ -164,7 +164,7 @@ The aim of implementing Self Organising Maps in this context is to be able to se
 </p>
 
  <p align="center">
-<img src="Pictures%20and%20Graphs/Counts%20and%20Neighbor%20distance%20plot/%20first%20graphical%20analysis.png" > 
+<img src="Pictures%20and%20Graphs/Counts%20and%20Neighbor%20distance%20plot-first%20graphical%20analysis.png" > 
  </p>  
  
 <p align="justify">
@@ -174,7 +174,7 @@ Linked to this graph, the "U-matrix" is analysed with the intent of showing the 
 </p>
 
  <p align="center">
-<img src="Pictures%20and%20Graphs/Codes%20plot%20and%20Clusters/%20second%20graphical%20inspection.png" > 
+<img src="Pictures%20and%20Graphs/Codes%20plot%20and%20Clusters-second%20graphical%20inspection.png" > 
  </p>  
  
 <p align="justify">
