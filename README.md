@@ -178,11 +178,19 @@ In line with this study, computing the list of all accesses per museum-date-ever
 </p>
 
 <img src="Pictures%20and%20Graphs/Representation%20of%20the%20card%20holders%20network.png" width="520" height="400"/> <img src="Pictures%20and%20Graphs/Zoomed%20figure.png" width="350" height="300"/> 
+  <p align="center">
+    <em> Figure 11 Representation of the card holders network and a zoomed version.</em>
+ </p>
+
+
 
  <p align="center">
 <img src="Pictures%20and%20Graphs/Distribution%20of%20the%20number%20of%20different%20people%20who%20shared%20visits%20by%20renewal (si2014).png" > 
  </p> 
- 
+   <p align="center">
+    <em> Figure 12 Distribution of the number of different people who shared visits by renewal (si2014).</em>
+ </p>
+
 <p align="justify">
 It is noteworthy that the greater is the number of distinct people with whom all visits have been shared, the greater is the frequency of renewals compared to those who churn. The most interesting aspect that emerges is that those who churn are accompanied by a number of different people on average lower, suggesting that the variable in question, may have a negative effect on the probability of abandoning. It can probably be interpreted with the fact that the greater is the number of people with whom one shares a passion for art or cultural visits, the greater is the stimulus received to renew the subscription.
 Moreover, according to the average age of those who go to the museum with a smaller number of people, on average it appears that they are older than those who share visits with a larger number of distinct people.
@@ -193,11 +201,16 @@ where went people who visited a particular site).
  <p align="center">
 <img src="Pictures%20and%20Graphs/%20Infographic%20representing%20the%20twenty-five%20most%20visited%20museums%20in%202013%20by%20subscribers.png" > 
  </p> 
- 
+    <p align="center">
+    <em> Figure 13 Infographic representing the 25 most visited museums in 2013 by subscribers.</em>
+ </p>
+
  <p align="center">
 <img src="Pictures%20and%20Graphs/Representation%20of%20Museo%20Egizio,%20Reggia%20di%20Venaria%20Reale%20and%20Royal%20Palace%20network.png" > 
  </p>  
- 
+     <p align="center">
+    <em> Figure 14 Representation of Museo Egizio, Reggia di Venaria Reale and Royal Palace network.</em>
+ </p>
 Most of the reported "rules” highlights visits to close-located museums, especially in the Centre of Turin. Unfortunately, it cannot be understood whether this is an effect linked to individual thematic preferences or simply a proximity effect.
 
 <a name="usa"></a>
@@ -211,7 +224,9 @@ The aim of implementing Self Organising Maps in this context is to be able to se
  <p align="center">
 <img src="Pictures%20and%20Graphs/Counts%20and%20Neighbor%20distance%20plot-first%20graphical%20analysis.png" > 
  </p>  
- 
+  <p align="center">
+    <em> Figure 15 Counts and Neighbor distance plot: first graphical analysis.</em>
+ </p>
 <p align="justify">
  
 The graph shows the number of observations "captured" by each neuron and the areas with higher density. In this case the map is a 20x20 grid and, as can be inferred from the adjacent coloured scale; thicker areas are more frequent in the left area and, in particular, the empty neurons (in grey tones) graphically tend to delimit the distinct areas.
@@ -221,7 +236,9 @@ Linked to this graph, the "U-matrix" is analysed with the intent of showing the 
  <p align="center">
 <img src="Pictures%20and%20Graphs/Codes%20plot%20and%20Clusters-second%20graphical%20inspection.png" > 
  </p>  
- 
+   <p align="center">
+    <em> Figure 16 Codes plot and Clusters: second graphical inspection.</em>
+ </p>
 <p align="justify">
 Furthermore the observation of the codes also let us identify some other areas (in addition to the two main ones highlighted by the "U-matrix") in line with what examined in the count plot. Moreover, it is possible to catalogue 4 clusters whose relevant characteristics have to be examined, for a hermeneutical interpretation, both with regard to the variables considered in and out the algorithm.
 </p>
@@ -229,12 +246,17 @@ Furthermore the observation of the codes also let us identify some other areas (
  <p align="center">
 <img src="Pictures%20and%20Graphs/Comparison%20between%20clusters%20by%20discount%20and%20number%20of%20visits.png" > 
  </p>  
- ...
+   <p align="center">
+    <em> Figure 17 Comparison between clusters by discount and number of visits.</em>
+ </p>
  
  <p align="center">
 <img src="Pictures%20and%20Graphs/Comparison%20between%20clusters%20by%20gender%20and%20churn.png" > 
  </p>  
-
+   <p align="center">
+    <em> Figure 18 Comparison between clusters by gender and churn.</em>
+ </p>
+ 
 
 <p align="justify">
 From this first comparative analysis is evident that the fourth cluster effectively manages to capture those who do not renew the subscription. Now the interest is to understand if this identified group shows different characteristics for the other variables. Sex seems to be more or less uniform as tendency among the clusters; in all groups women prevail and thus, at first glance, it is not possible to identify a clear relationship.
@@ -243,7 +265,9 @@ From this first comparative analysis is evident that the fourth cluster effectiv
  <p align="center">
 <img src="Pictures%20and%20Graphs/Comparison%20between%20clusters%20by%20living%20in%20Turin%20and%20Age.png" > 
  </p>  
-
+   <p align="center">
+    <em> Figure 19 Comparison between clusters by living in Turin and Age.</em>
+ </p>
 <p align="justify">
 Taking into account these graphical representations, we may formulate a definition of the obtained clusters:
  
@@ -280,7 +304,9 @@ To allow such an interpretation in terms of odds ratio, the coefficients are pre
  <p align="center">
 <img src="Pictures%20and%20Graphs/Graph%20showing%20the%20main%20odds%20ratio%20variables.png" > 
  </p>  
-
+   <p align="center">
+    <em> Figure 22 Graph showing the main odds ratio variables.</em>
+ </p>
 
 <a name="u"></a>
 Classification Models and Profit Lines
@@ -302,7 +328,9 @@ In order to overcome the problem, a representation in terms of Roc Curve is prop
   <p align="center">
 <img src="Pictures%20and%20Graphs/Roc%20Curves%20of%20the%20six%20models%20studied.png" > 
  </p>  
-
+   <p align="center">
+    <em> Figure 23 Roc Curves of the six models studied.</em>
+ </p>
 </p>
 <p align="justify">
 Taking into account these problems, there is a need for a study that can reconcile the necessity of defining the best model with contemporary considerating costs and profits. After the "training" has been carried out and the coefficients estimated, the same coefficients are applied to obtain a probability or score of renewal for each consumer. Each model will associate to the same person (with certain individual characteristics), a differing probability.
@@ -321,7 +349,9 @@ The budget constraint placed at 5000 euros is represented with a vertical dotted
  <p align="center">
 <img src="Pictures%20and%20Graphs/Profit%20Lines%20with%20cumulative%20profits%20sorted%20by%20expected%20profit.png" > 
  </p>  
-
+   <p align="center">
+    <em> Figure 24 Profit Lines with cumulative profits sorted by expected profit.</em>
+ </p>
 In conclusion, a further robustness analysis has been proposed to validate the data obtained.
 In particular, a problem related to the annuality of subscriptions is highlighted: the duration does not
 coincide with the calendar year but it is valid for 365 days from the day of the activation. In quantitative
