@@ -104,7 +104,9 @@ A quick inspection of the distribution by Cap of the subscribers allows us to co
 </p
 
  <p align="center">
-<img src="Pictures%20and%20Graphs/Territorial%20distribution%20of%20the%20number%20of%20cumulative%20entries%20for%20Turin%20cap.png" > 
+ 
+<img src="Pictures%20and%20Graphs/Territorial%20distribution%20of%20the%20number%20of%20cumulative%20entries%20for%20Turin%20cap.png" height="300"> 
+ 
  </p>
  
 
@@ -113,7 +115,7 @@ The map of the province of Turin shows the number of cumulated entries per Cap a
 </p>
 
  <p align="center">
-<img src="Pictures%20and%20Graphs/Distribution%20of%20churn%20relative%20frequencies%20in%20Turin.png" > 
+<img src="Pictures%20and%20Graphs/Distribution%20of%20churn%20relative%20frequencies%20in%20Turin.png" height="300"> 
  </p> 
  
  **e tabella**
