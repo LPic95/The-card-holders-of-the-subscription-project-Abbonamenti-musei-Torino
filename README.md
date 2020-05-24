@@ -36,7 +36,10 @@ In addition to these socio-demographic variables (already included in the refere
 Moreover, thanks to the study of the consumers’ joint visit through the association rules, it has been possible to consider in the descriptive analysis, **the number of visits that each individual has made at least with another person (binding no less than two shared entries), the average number of people with whom each member has shared an exhibition visit and finally the number of different people with whom each subscriber has logged in**. One of the first studies carried out, in terms of descriptive analysis, is related to the renewal by gender and age.
 </p>
 
-**FIGURA 1**
+ <p align="center">
+<img src="Pictures%20and%20Graphs/Distributionof%20the%20renewal%20variable%20(si2014)%20by%20gender.png" > 
+ </p>
+
 <p align="justify">
 Taking into account the first two levels of the variable, there is a slight difference in terms of relative frequencies: in particular in this sample, the frequency of women who renew is around 70% while it is of 69% for men. The third column shows the units for which there is no answer linked to the gender variable and it allows us to reject the hypothesis of a link between NA and the renewal by sex variable, since the distribution seems to be similar to the other columns.
 </p>
