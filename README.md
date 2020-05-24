@@ -39,13 +39,18 @@ Moreover, thanks to the study of the consumers’ joint visit through the associ
  <p align="center">
 <img src="Pictures%20and%20Graphs/Distribution%20of%20the%20renewal%20variable%20(si2014)%20by%20gender.png" > 
  </p>
-
+ <p align="center">
+    <em> Figure 1 Distribution of the renewal variable (si2014) by gender.</em>
+ </p>
 <p align="justify">
 Taking into account the first two levels of the variable, there is a slight difference in terms of relative frequencies: in particular in this sample, the frequency of women who renew is around 70% while it is of 69% for men. The third column shows the units for which there is no answer linked to the gender variable and it allows us to reject the hypothesis of a link between NA and the renewal by sex variable, since the distribution seems to be similar to the other columns.
 </p>
 
  <p align="center">
 <img src="Pictures%20and%20Graphs/Distribution%20of%20the%20renewal%20variable%20(si2014)%20by%20age.png" > 
+ </p>
+ <p align="center">
+    <em> Figure 2 Distribution of the renewal variable (si2014) by age.</em>
  </p>
 
 <p align="justify">
@@ -56,9 +61,15 @@ Therefore, unlike gender, it can be concluded that the age variable differs sign
  <p align="center">
 <img src="Pictures%20and%20Graphs/Distribution%20of%20the%20renewal%20variable%20by%20residence%20variable%20levels.png" > 
  </p>
- 
+  <p align="center">
+    <em> Figure 3 Distribution of the renewal variable by residence variable levels.</em>
+ </p>
+
 <p align="center"><table style="border-collapse:collapse;border-spacing:0" class="tg"><thead><tr><th style="border-color:inherit;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;font-weight:bold;overflow:hidden;padding:10px 5px;text-align:left;vertical-align:top;word-break:normal">Areas</th><th style="border-color:inherit;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;font-weight:bold;overflow:hidden;padding:10px 5px;text-align:left;vertical-align:top;word-break:normal">N° people who churn</th><th style="border-color:inherit;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;font-weight:bold;overflow:hidden;padding:10px 5px;text-align:left;vertical-align:top;word-break:normal">N° people who renew</th></tr></thead><tbody><tr><td style="border-color:inherit;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;font-weight:bold;overflow:hidden;padding:10px 5px;text-align:left;vertical-align:top;word-break:normal">Torino</td><td style="border-color:inherit;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 5px;text-align:center;vertical-align:top;word-break:normal">11291</td><td style="border-color:inherit;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 5px;text-align:center;vertical-align:top;word-break:normal">29893</td></tr><tr><td style="border-color:inherit;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;font-weight:bold;overflow:hidden;padding:10px 5px;text-align:left;vertical-align:top;word-break:normal">Cintura1</td><td style="border-color:inherit;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 5px;text-align:center;vertical-align:top;word-break:normal">5415</td><td style="border-color:inherit;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 5px;text-align:center;vertical-align:top;word-break:normal">11489</td></tr><tr><td style="border-color:inherit;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;font-weight:bold;overflow:hidden;padding:10px 5px;text-align:left;vertical-align:top;word-break:normal">Cintura2</td><td style="border-color:inherit;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 5px;text-align:center;vertical-align:top;word-break:normal">2075</td><td style="border-color:inherit;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 5px;text-align:center;vertical-align:top;word-break:normal">4040</td></tr><tr><td style="border-color:inherit;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;font-weight:bold;overflow:hidden;padding:10px 5px;text-align:left;vertical-align:top;word-break:normal">Altrove</td><td style="border-color:inherit;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 5px;text-align:center;vertical-align:top;word-break:normal">4914</td><td style="border-color:inherit;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 5px;text-align:center;vertical-align:top;word-break:normal">8596</td></tr></tbody></table></p>
- 
+   <p align="center">
+    <em> Table 1 showing levels of the variable residence by number of people who renew and do not.</em>
+ </p>
+
 <p align="justify">
 The bar chart above shows how the distribution of renewals varies by geographic area: thus, the more one gets away from the City of Turin, the more the relative churn frequencies tend to increase. To enrich this study the adjacent table is reported in absolute terms and it shows that the largest number of members who renew the card comes from the capital of Piedmont and that the two “belts” together have the largest number of renewals of the rest of Northern Italy.
 These two analyses, taken together, highlight the relevance of this variable for the purpose of this report.
@@ -67,6 +78,9 @@ These two analyses, taken together, highlight the relevance of this variable for
  <p align="center">
 <img src="Pictures%20and%20Graphs/Distribution%20of%20the%20number%20of%20visits%20for%20each%20ID%20comparing%20those%20who renew%20and%20churn.png" > 
  </p>
+ <p align="center">
+    <em> Figure 4 Distribution of the number of visits for each ID comparing those who renew and churn.</em>
+ </p>
 
 <p align="justify">
 The density curves show how the relative distribution of the number of visits differs between people who renew their subscription compared to those who churn. It can be predictably assumed that the number of visits influences positively the probability of renewal (re-subscription card).
@@ -74,6 +88,9 @@ The density curves show how the relative distribution of the number of visits di
  
  <p align="center">
 <img src="Pictures%20and%20Graphs/Distribution%20of%20the%20cumulative%20entry%20cost%20for%20each%20id%20by%20comparing%20those%20who%20renew%20and%20churn.png" > 
+ </p>
+ <p align="center">
+    <em> Figure 5 Distribution of the cumulative entry cost for each ID by comparing those who renew and churn.</em>
  </p>
 
  <p align="justify">
@@ -84,6 +101,10 @@ The variable highlights the costs that would have been incurred if the visitors 
  <p align="center">
 <img src="Pictures%20and%20Graphs/Distribution%20of%20discount%20variable%20by%20renewal%20(2014).png" > 
  </p>
+ <p align="center">
+    <em> Figure 6 Distribution of discount variable by renewal (2014).</em>
+ </p>
+ 
 <p align="justify">
 The above bar chart shows the discount variable, at first defined by 24 levels and, for clarity, here coded as a dummy; in detail it is clear that the proportion of withdrawals among those who have not received any discount or reduction on the subscription price is significantly higher if compared to the respective proportion of subscribers with discount rights.
 </p>
@@ -92,12 +113,18 @@ The above bar chart shows the discount variable, at first defined by 24 levels a
  <p align="center">
 <img src="Pictures%20and%20Graphs/Weekly%20frequency%20of%20entries%20for%20renewal%20and%20churn.png" > 
  </p>
+ <p align="center">
+    <em> Figure 7 Weekly frequency of entries for renewal and churn.</em>
+ </p>
  
 <p align="justify">
 The distribution of visits does not seem to differ on weekdays between those who renew and do not: however there is a slight variation on weekends and in particular those who renew the subscription tend to visit more museum sites on weekends with significant distribution on Fridays and Saturdays (in addition to differing even on less common days such as Wednesdays and Thursdays in favour of those who renew the card). 
 </p>
 
 <img src="Pictures%20and%20Graphs/Representation%20of%20the%20territorial%20distribution%20of%20museum%20card%20holders%20in%20Northern%20Italy.png" width="520" height="400"/> <img src="Pictures%20and%20Graphs/Representation%20of%20the%20territorial%20distribution%20of%20museum%20card%20holders%20in%20the%20city%20of%20Turin.png" width="350" height="300"/> 
+ <p align="center">
+    <em> Figure 8 Representation of the territorial distribution of museum card holders in Northern Italy and in the city of Turin.</em>
+ </p>
 
 <p align="justify">
 A quick inspection of the distribution by Cap of the subscribers allows us to conclude that this effect can be analyzed especially in the Turin hinterland and, for this reason, we focus on the Turin Cap because of the highest number of members. The most numerous members are concentrated in the Mirafiori area (North), Borgo San Paolo and Pozzo Strada. It is curious to note that the most central areas such as San Donato and Quadrilatero, despite their great proximity to the museum sites, in absolute terms show the lowest number of members.
@@ -106,6 +133,9 @@ A quick inspection of the distribution by Cap of the subscribers allows us to co
 <p align="center">
  <img src="Pictures%20and%20Graphs/Territorial%20distribution%20of%20cumulative%20entries%20for%20Turin%20cap.png"> 
 </p>
+ <p align="center">
+    <em> Figure 9 Territorial distribution of the number of cumulative entries for Turin cap.</em>
+ </p>
 
 
 <p align="justify">
@@ -115,7 +145,10 @@ The map of the province of Turin shows the number of cumulated entries per Cap a
  <p align="center">
 <img src="Pictures%20and%20Graphs/Distribution%20of%20churn%20relative%20frequencies%20in%20Turin.png" height="300"> 
  </p> 
- 
+  <p align="center">
+    <em> Figure 10 Distribution of churn relative frequencies in Turin.</em>
+ </p>
+
 
  
 | Cap   	| Number of card owners 	| Number of renewal 	| Prob. of churn 	|
@@ -125,6 +158,9 @@ The map of the province of Turin shows the number of cumulated entries per Cap a
 | 10131 	| 886                   	| 692               	| 0.218961       	|
 | 10145 	| 615                   	| 468               	| 0.239024       	|
 
+  <p align="center">
+    <em> Table 2 Turin cap with maximum and minimum probability of churn.</em>
+ </p>
 
 
 <p align="justify">
