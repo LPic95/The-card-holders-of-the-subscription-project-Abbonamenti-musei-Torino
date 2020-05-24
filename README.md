@@ -110,6 +110,26 @@ The graph shows the number of observations "captured" by each neuron and the are
 Linked to this graph, the "U-matrix" is analysed with the intent of showing the distance between the identified neurons. In particular, it is evident that there are two well-defined and clearer areas; so that you can at least consider two groups, whose deep colour is inversely proportional to the distance.
 </p>
 
+<p align="justify">
+Furthermore the observation of the codes also let us identify some other areas (in addition to the two main ones highlighted by the "U-matrix") in line with what examined in the count plot. Moreover, it is possible to catalogue 4 clusters whose relevant characteristics have to be examined, for a hermeneutical interpretation, both with regard to the variables considered in and out the algorithm.
+</p>
+
+
+<p align="justify">
+From this first comparative analysis is evident that the fourth cluster effectively manages to capture those who do not renew the subscription. Now the interest is to understand if this identified group shows different characteristics for the other variables. Sex seems to be more or less uniform as tendency among the clusters; in all groups women prevail and thus, at first glance, it is not possible to identify a clear relationship.
+</p>
+
+<p align="justify">
+Taking into account these graphical representations, we may formulate a definition of the obtained clusters:
+ 
+* __First cluster__: mainly contains residents of Turin with higher average age, average number of visits and average number of discount receivers. The index variable (average number of people with whom they entered) is also higher than all the other groups analyzed.
+
+* __Second cluster__: has a majority of non-residents in Turin. It does not differ from the first one in proportion to people who received discounts and to the average age. The variable “average number of people” does not seem to differ from the remaining groups.
+
+* __Third cluster__: it tends to be composed by a large proportion of Turin City inhabitants, mainly women, although this is the group with the highest proportion of men. The average age and number of visits are lower than those of the previous clusters.
+* __Fourth cluster__: Mainly non-resident subjects in Turin, with number of visits and average age lower than all the other clusters. The majority of these individuals did not receive any discount.
+</p>
+
 
 
 <a id="note1" href="#note1ref"><sup>1</sup></a>In a similar way to the application shown by Rawan Ghnemat and Edward Jaser in the paper "Classification of Mobile Customers Behavior and Usage Patterns using Self-Organizing Neural Networks", International Journal of Interactive Mobile Technologies, Volume 9, Issue 4, 2015.
