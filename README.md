@@ -291,11 +291,24 @@ The aim of this section is not only descriptive but causal; the purpose is to id
 At the same level of residence women are more likely to renew than men - in line with what has been analyzed at the descriptive level - and in particular it is surprising that for all numbers of visits, women living in the rest of Northern Italy ("Elsewhere") are more likely to re-subscribe than men living in the different belts of Piedmont capital.
 </p>
 
+ <p align="center">
+<img src="Pictures%20and%20Graphs/Profit%20Lines%20with%20cumulative%20profits%20sorted%20by%20expected%20profit.png" > 
+ </p>  
+   <p align="center">
+    <em> Figure 20 Probability of renewal according to the number of visits by residence variable on 4 levels and gender.</em>
+ </p>
 
 <p align="justify">
 These further charts, supporting the causal study, show the effect of both the amount paid for the subscription and the age of the members. For the first variable, the change in the price of the card has almost a linear effect on the probability, with the greatest decrease of around 4%, ceteris paribus. Differently, the age determines a visibly non-linear effect, the increase in probability is significant between 20 and 50 years, while it is much more limited in the following years.
 As already pointed out above, for these two variables there are no significant effects of interaction between gender and amount or gender and age (this consideration applies to the cap too).
 </p>
+
+ <p align="center">
+<img src="Pictures%20and%20Graphs/Profit%20Lines%20with%20cumulative%20profits%20sorted%20by%20expected%20profit.png" > 
+ </p>  
+   <p align="center">
+    <em> Figure 21 Probability of renewal according to the amount paid and age by Cap and Gender.</em>
+ </p>
 
 <p align="justify">
 To allow such an interpretation in terms of odds ratio, the coefficients are presented as arguments of an exponential function; this choice determines the fact that they are represented on a zero plus infinite scale and the effect is increasing or not depending on whether they are higher or lower than the unit. The coefficient higher than the unit means that the variable under examination has a positive effect on the probability of renewal. In particular, the explanatory with the greatest impact is "discount"; those who benefit from the discount more than double the odds. In addition to the considerations on the variable "number of entries", it results that the "number of shared entries" and the "number of different people" have a positive effect. Therefore It can be assumed that subjects who share a passion for art and exhibitions with a large number of people and do not go alone to the museums are more likely to renew; however, only one hypothesis is not fully supported by these data because, taking into account this sample, the number of people with whom one actually goes to the museum is not significant.
