@@ -103,7 +103,7 @@ The distribution of visits does not seem to differ on weekdays between those who
 A quick inspection of the distribution by Cap of the subscribers allows us to conclude that this effect can be analyzed especially in the Turin hinterland and, for this reason, we focus on the Turin Cap because of the highest number of members. The most numerous members are concentrated in the Mirafiori area (North), Borgo San Paolo and Pozzo Strada. It is curious to note that the most central areas such as San Donato and Quadrilatero, despite their great proximity to the museum sites, in absolute terms show the lowest number of members.</p
 
  <p align="center">
-<img src="Pictures%20and%20Graphs/Territorial%20distribution%20of%20the%20number%20of%20cumulative%20entries%20for%20Turin%20cap.png" height="300"> 
+<img src="Pictures%20and%20Graphs/Territorial%20distribution%20of%20cumulative%20entries%20for%20Turin%20cap.png" height="300"> 
  </p> 
 
 <p align="justify">
