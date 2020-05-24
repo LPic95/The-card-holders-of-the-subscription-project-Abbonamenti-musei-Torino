@@ -292,7 +292,7 @@ At the same level of residence women are more likely to renew than men - in line
 </p>
 
  <p align="center">
-<img src="Pictures%20and%20Graphs/Profit%20Lines%20with%20cumulative%20profits%20sorted%20by%20expected%20profit.png" > 
+<img src="Pictures%20and%20Graphs/%20Probability%20of%20renewal%20according%20to%20the%20number%20of%20visits%20by%20residence%20variable%20on%204%20levels%20and%20gender.png" > 
  </p>  
    <p align="center">
     <em> Figure 20 Probability of renewal according to the number of visits by residence variable on 4 levels and gender.</em>
@@ -304,7 +304,7 @@ As already pointed out above, for these two variables there are no significant e
 </p>
 
  <p align="center">
-<img src="Pictures%20and%20Graphs/Profit%20Lines%20with%20cumulative%20profits%20sorted%20by%20expected%20profit.png" > 
+<img src="Pictures%20and%20Graphs/Probability%20of%20renewal%20according%20to%20the%20amount%20paid%20and%20age%20by%20Cap%20and%20Gender.png" > 
  </p>  
    <p align="center">
     <em> Figure 21 Probability of renewal according to the amount paid and age by Cap and Gender.</em>
