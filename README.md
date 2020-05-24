@@ -37,7 +37,7 @@ Moreover, thanks to the study of the consumers’ joint visit through the associ
 </p>
 
  <p align="center">
-<img src="Pictures%20and%20Graphs/Distributionof%20the%20renewal%20variable%20(si2014)%20by%20gender.png" > 
+<img src="Pictures%20and%20Graphs/Distribution%20of%20the%20renewal%20variable%20(si2014)%20by%20gender.png" > 
  </p>
 
 <p align="justify">
