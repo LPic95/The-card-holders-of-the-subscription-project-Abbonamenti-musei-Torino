@@ -365,6 +365,7 @@ The budget constraint placed at 5000 euros is represented with a vertical dotted
    <p align="center">
     <em> Figure 24 Profit Lines with cumulative profits sorted by expected profit.</em>
  </p>
+ <p align="justify">
 In conclusion, a further robustness analysis has been proposed to validate the data obtained.
 In particular, a problem related to the annuality of subscriptions is highlighted: the duration does not
 coincide with the calendar year but it is valid for 365 days from the day of the activation. In quantitative
@@ -374,9 +375,28 @@ to them, since the first months of 2014 do not appear.
 In order to bypass the problem and hypothesizing a uniform distribution of visits over the year, the data
 have been annualized <a href="#note2" id="note2ref"><sup>2</sup></a>. Finally the result confirms what has been argued so far, that is to say that the
 most performing and profitable model is the Random Forest.
+ </p>
 
 
 
-<a id="note1" href="#note1ref"><sup>1</sup></a>In a similar way to the application shown by Rawan Ghnemat and Edward Jaser in the paper "Classification of Mobile Customers Behavior and Usage Patterns using Self-Organizing Neural Networks", International Journal of Interactive Mobile Technologies, Volume 9, Issue 4, 2015.
 
-<a id="note2" href="#note1ref"><sup>2</sup></a> If panel data had been available, the visits could have been annualised on the basis of previous years.
+<br/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a id="note1" href="#note1ref"><sup>1</sup></a>In a similar way to the application shown by Rawan Ghnemat and Edward Jaser in the paper "Classification of Mobile Customers Behavior and Usage Patterns using Self-Organizing Neural Networks", International Journal of Interactive Mobile Technologies, Volume 9, Issue 4, 2015.<br/>
+
+<a id="note2" href="#note1ref"><sup>2</sup></a> If panel data had been available, the visits could have been annualised on the basis of previous years.<br/>
