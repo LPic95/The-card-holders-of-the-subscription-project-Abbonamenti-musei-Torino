@@ -10,7 +10,7 @@ Table of contents
 4. [ Self-Organising Maps ](#usa)
 5. [ Casual Model(Logit) ](#us)
 6. [ Classification Models and Profit Lines](#u)
-
+7. [ Comments and footnotes](#m)
 
 <a name="desc"></a>
 Preface
@@ -407,16 +407,13 @@ most performing and profitable model is the Random Forest.
 
 
 
+<a name="m"></a>
+Comments and footnotes
+-----------
 
 
-
-
-
-
-
-
-
-
+Please do not hesitate to contact me if you are interested in the script or in the implementation of any techniques. <br/>
+Thanks for your attention.
 
 
 
