@@ -1,3 +1,6 @@
+ [![HitCount](http://hits.dwyl.com/LPic95/The-card-holders-of-the-subscription-project-Abbonamenti-musei-Torino-.svg)](http://hits.dwyl.com/LPic95/The-card-holders-of-the-subscription-project-Abbonamenti-musei-Torino-)
+
+ 
  <p align="center">
 <img src="Pictures%20and%20Graphs/First_page.png" > 
  </p>
