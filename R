@@ -1,0 +1,2169 @@
+#Libraries
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(lubridate)
+library(chron)
+library(naniar)
+library(VIM)
+library(ggmap) 
+library(maptools)
+library(sp)
+library(rgdal)
+library(rstanarm)
+#library(plyr)
+library(gpclib)
+library(ggsn)
+library(knitr)
+library(plotly)
+library(ggthemes)
+library(tidyverse)
+library(readxl)
+library(knitr)
+library(ggplot2)
+library(lubridate)
+library(arules)
+library(arulesViz)
+library(data.table)
+library(stringr)
+library(DT)
+library(plotly)
+library(visNetwork)
+library(igraph)
+library(kableExtra)
+library(naniar)
+require(kohonen)
+library( fastDummies)
+library(DMwR)
+require(magrittr)
+library(RColorBrewer)
+library(devtools)
+library(ggmap)
+library(ROCR) 
+library(party)
+library(e1071)
+library(randomForest)
+library(pBrackets)
+
+
+an13=read.csv("~/an13.csv",fileEncoding="latin1")
+an13=an13[,-1]
+
+in13=read.csv("~/in13.csv",fileEncoding="latin1")
+
+data1=read.csv("~/data1.csv",fileEncoding="latin1")
+
+dati=merge(x=an13,y=data1,by="codcliente")
+in13$X=NULL
+colnames(in13)[7]="codcliente" 
+dati_completi=merge(x=an13,y=in13,by= "codcliente") 
+names(dati_completi)[3]="importo_abbon"
+dati_completi$professione=NULL
+
+
+
+
+
+dati_completi$datai=as.Date(dati_completi$datai,format="%d/%m/%Y")
+class(dati_completi$datai)
+
+#count how many entries there are for each id
+
+data_count=dati_completi %>%
+  group_by(codcliente) %>%
+  summarise(count= n())
+
+dati=merge(dati,data_count,by="codcliente",all.x =T)
+summary(dati$count)
+dati$count[is.na(dati$count)]=0 #I guess if they don't show up on the visitor's list, they have no visitors.
+
+dati$X=NULL
+#rimuovo variabile X di data1
+
+
+###### CAP
+
+dati$cap=as.numeric(as.character(dati$cap))
+dati$cap=ifelse(dati$cap<10000  ,NA, dati$cap)
+summary(dati$cap)
+
+dati$cap=ifelse(dati$comune=="TORINO" & is.na(dati$cap) , 10100, dati$cap)
+summary(dati$cap)
+
+dati$cap_NO=ifelse(dati$cap>=10010 & dati$cap<=46100 ,dati$cap,0)
+summary(dati$cap_NO)
+colnames(dati)[20]="IT_CAP"
+ceiling(dati$IT_CAP)
+summary(dati$IT_CAP)
+
+
+
+
+
+
+######ANALISI NA############
+
+#install.packages("naniar")
+#install.packages("VIM")
+library(naniar)
+library(VIM)
+dati$data_nascita=as.numeric(as.character(dati$data_nascita))
+class(dati$data_nascita)
+dati$eta=2013-dati$data_nascita
+summary(dati$eta)
+
+i=which(dati$eta<=1)
+dati$eta[i]=NA
+
+indice_anziani=which(dati$eta>=110)
+table(dati$eta[indice_anziani],dati$riduzione[indice_anziani])
+#only 7 people actually benefit from the over 60 discount...
+dati$eta[indice_anziani]=NA 
+
+
+gg_miss_var(dati)
+#It can be inferred from this first chart that the profession is entirely NA. So at first impact we can remove it.
+dati$professione=NULL #si toglie professione
+
+summary(aggr(dati, sortVar=TRUE))$combinations
+
+marginplot(dati[,c("count","importo")])
+
+summary(dati$sesso)#2410 NA per genere
+summary(dati$tipo_pag)#nessun NA
+
+
+#Graphical analysis#
+######Sex######
+
+#Sex by churn
+df1=dati %>% count(sesso, si2014) %>% group_by(sesso) %>% mutate(prop = n / sum(n))
+
+d=ggplot(data = df1, aes(x = as.factor(df1$si2014) ,y=df1$prop)) + geom_bar(aes(fill = as.factor(df1$si2014)),stat="identity")+labs(fill = "Renewal")+facet_wrap(.~df1$sesso)+theme_bw()+
+  labs(title="Renewal by gender ", x ="Gender", y = "Relative frequencies")
+r=d+theme(plot.title = element_text(hjust = 0.5),panel.background = element_rect(colour = 'grey90', fill ="#f5f5f2"))+scale_colour_manual(values = brewer.pal(10, "Paired")[c(2,3)],aesthetics = "fill")
+r
+ggplotly(r)
+
+
+
+#payment method by sex
+
+df2=dati %>% count(sesso, tipo_pag) %>% group_by(sesso) %>% mutate(prop = n / sum(n))
+
+d=ggplot(data = df2, aes(x = df2$tipo_pag,y=prop)) + geom_bar(aes(fill = df2$tipo_pag),stat="identity")+labs(fill = "Tipo di pagamento")+ facet_wrap(.~df2$sesso)+theme_bw()+
+  labs(title="Tipo di pagamento per genere", x ="Tipo di pagamento", y = "Frequenze relative")#+geom_text(aes(label = value), vjust = -0.3) 
+r=d+theme(axis.text.x=element_blank(),plot.title = element_text(hjust = 0.5),panel.background = element_rect(colour = 'grey90', fill ="#f5f5f2"))+scale_fill_brewer( palette = 4, direction = 1,aesthetics = "fill")
+ggplotly(r)
+
+###Age#####
+
+# ETA PER GENERE
+
+#con distribuzione continua.
+rt=ggplot(data=dati,aes(x=dati$eta, group=dati$sesso, fill=dati$sesso)) + geom_density(adjust=1.2 ,alpha=0.5)+xlim(0,100)+labs(fill = "Genere")+
+  labs(title="Distribuzione degli anni dei tesserati per genere",x ="Anni", y = "Densit??")+theme(plot.title = element_text(hjust = 0.5),panel.background = element_rect(colour = 'grey90', fill ="#f5f5f2"))
+ggplotly(rt)
+
+
+dati$classi_eta=0
+
+dati$classi_eta[dati$eta<=25]="Under 25"
+dati$classi_eta[dati$eta>25 & dati$eta<=45] ="(25;45]"
+dati$classi_eta[dati$eta>45 & dati$eta<60] ="(45;60)"
+dati$classi_eta[dati$eta>=60] ="Over 60"
+dati$classi_eta=factor(dati$classi_eta,levels=c("Under 25","(25;45]","(45;60)","Over 60"))
+summary(dati$classi_eta)
+
+
+df3=dati %>% count(sesso,classi_eta) %>% group_by(sesso) %>% mutate(prop = n / sum(n))
+
+d3=ggplot(data = df3, aes(x = df3$classi_eta,y=prop)) + geom_bar(aes(fill = df3$classi_eta),stat="identity")+labs(fill = "Classi di et\uE0")+ facet_wrap(.~df3$sesso)+theme_bw()+
+  labs(title="Genere per classe di et\uE0",x ="Classi di et\uE0", y = "Frequenze relative")
+
+d33=d3+theme(axis.text.x=element_blank(),plot.title = element_text(hjust = 0.5),panel.background = element_rect(colour = 'grey90', fill ="#f5f5f2"))#+scale_fill_brewer( palette = 9, direction = 1,
+ggplotly(d33)
+
+
+
+##Age by churn###
+
+A=ggplot(data=dati,aes(x=dati$eta, group=as.factor(dati$si2014), fill=as.factor(dati$si2014))) + geom_density(adjust=1.2 ,alpha=0.5)+xlim(0,100)+labs(fill = "Renewal")+
+  labs(title="Renewal by age",x ="Age", y = "Density")+theme(plot.title = element_text(hjust = 0.5),panel.background = element_rect(colour = 'grey90', fill ="#f5f5f2"))+scale_colour_manual(values = brewer.pal(10, "Paired")[c(2,3)],aesthetics = "fill")
+A
+ggplotly(A)
+
+indice1=which(dati$si2014==1)
+summary(dati$eta[indice1])
+summary(dati$eta[-indice1])
+
+table(dati$si2014)
+
+
+#Sex by entries
+
+E=ggplot(data=dati,aes(x=dati$count, group=dati$sesso, fill=dati$sesso)) + geom_density(adjust=1.2 ,alpha=0.5)+xlim(0,70)+labs(fill = "Genere")+
+  labs(title="Distribuzione del numero degli ingressi per genere",x ="Numero ingressi", y = "Densit??")+theme(plot.title = element_text(hjust = 0.5),panel.background = element_rect(colour = 'grey90', fill ="#f5f5f2"))
+ggplotly(E)
+O=ggplot(data=dati,aes(x=dati$count, group=as.factor(dati$si2014), fill=as.factor(dati$si2014))) + geom_density(adjust=1.2 ,alpha=0.5)+xlim(0,70)+labs(fill = "Renewal")+
+  labs(title="Distribution of the number of museum entrances by renewal",x ="Number of museum entrances", y = "Density")+theme(plot.title = element_text(hjust = 0.5),panel.background = element_rect(colour = 'grey90', fill ="#f5f5f2"))+scale_colour_manual(values = brewer.pal(10, "Paired")[c(2,3)],aesthetics = "fill")
+O
+ggplotly(O)
+
+
+#####Amount paid by churn#######
+dati$classi_importo=0
+
+dati$classi_importo[dati$importo<=20]="Under 20"
+dati$classi_importo[dati$importo>20 & dati$importo<=35] ="(20;35]"
+dati$classi_importo[dati$importo>35 & dati$importo<=49] ="(35;49]"
+
+dati$classi_importo=factor(dati$classi_importo,levels=c("Under 20","(20;35]","(35;49]"))
+summary(dati$classi_importo)
+
+df10=dati %>% count(si2014,classi_importo) %>% group_by(si2014) %>% mutate(prop = n / sum(n))
+
+d3=ggplot(data = df10, aes(x = df10$classi_importo,y=prop)) + geom_bar(aes(fill = df10$classi_importo),stat="identity")+labs(fill = "Classi di importo")+ facet_wrap(.~df10$si2014)+theme_bw()+
+  labs(title="Rinnovo per classe di importo",x ="Classi di importo", y = "Frequenze relative")
+
+d33=d3+theme(plot.title = element_text(hjust = 0.5),panel.background = element_rect(colour = 'grey90', fill ="#f5f5f2"))#+scale_fill_brewer( palette = 9, direction = 1,
+d33
+ggplotly(d33)
+
+
+
+
+M=ggplot(data=dati,aes(x=dati$importo, fill=as.factor(dati$si2014))) + geom_density(adjust=1.2 ,alpha=0.5)+labs(fill = "Rinnovo")+
+  labs(title="Distribuzione degli importi pagati per rinnovo",x ="Importo pagato", y = "Densit??")+theme(plot.title = element_text(hjust = 0.5),panel.background = element_rect(colour = 'grey90', fill ="#f5f5f2"))
+M
+ggplotly(M)
+re=which(dati$importo>44)#ovvero 49 euro
+length(re)#7860
+
+table(dati[re,]$importo,dati[re,]$si2014) 
+
+######Geo plot:Torino ####
+
+dato=dati
+dato$Torino=ifelse(dato$IT_CAP>=10121 & dato$IT_CAP<=10156,1,0)                                                                                                                                                                                                                                       
+dato$cintura_1=ifelse(dato$IT_CAP==10020|dato$IT_CAP==10023|dato$IT_CAP==10024|dato$IT_CAP==10025|dato$IT_CAP==10028|dato$IT_CAP==10036|dato$IT_CAP==10040|dato$IT_CAP==10042|dato$IT_CAP==10043|dato$IT_CAP==10044|dato$IT_CAP==10071|dato$IT_CAP==10072|dato$IT_CAP==10078|dato$IT_CAP==10091|dato$IT_CAP==10092|dato$IT_CAP==10093|dato$IT_CAP==10095|dato$IT_CAP==10098|dato$IT_CAP==10099,1,0)
+dato$cintura_2=ifelse(dato$IT_CAP==10022|dato$IT_CAP==10026|dato$IT_CAP==10029|dato$IT_CAP==10032|dato$IT_CAP==10034|dato$IT_CAP==10041|dato$IT_CAP==10045|dato$IT_CAP==10046|dato$IT_CAP==10048|dato$IT_CAP==10051|dato$IT_CAP==10060|dato$IT_CAP==10070|dato$IT_CAP==10073|dato$IT_CAP==10077|dato$IT_CAP==10088|dato$IT_CAP==10090,1,0)
+dato$altrove=ifelse(dato$Torino==0 & dato$cintura_1==0 & dato$cintura_2==0,1,0)
+
+dato$zona=ifelse(dato$Torino==1,"Torino",0)
+dato$zona=ifelse(dato$cintura_1==1,"Cintura1",dato$zona)
+dato$zona=ifelse(dato$cintura_2==1,"Cintura2",dato$zona)
+dato$zona=ifelse(dato$altrove==1,"Altrove",dato$zona)
+table(dato$zona)
+ft=which(is.na(dato$zona))
+dato=dato[-ft,]
+
+df4=dato %>% count(zona,si2014) %>% group_by(zona) %>% mutate(prop = n / sum(n))
+
+d=ggplot(data = df4, aes(x = as.factor(df4$si2014),y=prop)) + geom_bar(aes(fill = as.factor(df4$si2014)),stat="identity")+labs(fill = "Renewal")+ facet_wrap(.~df4$zona)+theme_bw()+
+  labs(title="Renewal by zones", x ="Zones", y = "Relative frequencies")#+geom_text(aes(label = value), vjust = -0.3) 
+r=d+theme(plot.title = element_text(hjust = 0.5),panel.background = element_rect(colour = 'grey90', fill ="#f5f5f2"))+scale_colour_manual(values = brewer.pal(8, "Accent")[4:5],aesthetics = "fill")
+r
+ggplotly(r)
+indicatore1=which(dato$zona=="Torino")
+indicatore2=which(dato$zona=="Cintura1")
+indicatore3=which(dato$zona=="Cintura2")
+indicatore4=which(dato$zona=="Altrove")
+table(dato[indicatore1,]$si2014)
+table(dato[indicatore2,]$si2014)
+table(dato[indicatore3,]$si2014)
+table(dato[indicatore4,]$si2014)
+
+#######WHICH ARE THE MOST POPULAR DAYS?****
+
+dati_completi$giorno=weekdays(dati_completi$datai)
+codcliente=dati$codcliente
+churn=dati$si2014
+dati_completi2=data.frame(codcliente,churn)
+dati_completi$giorno=factor(dati_completi$giorno,levels=c("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"))
+levels(dati_completi$giorno)
+dati_completi2=merge(dati_completi,dati_completi2,by="codcliente")
+
+df6=dati_completi2 %>% count(giorno,churn) %>% group_by(churn) %>% mutate(prop = n / sum(n))
+df6$churn=ifelse(df6$churn==0,"Churn", "Renewal")
+
+Z=ggplot(df6,aes(x=df6$giorno,y=df6$prop))+geom_bar(aes(fill=df6$giorno),stat="identity")+labs(fill="Weekdays")+labs(title="Weekly frequency of entries for renewal and churn", x="Weekdays",y="Relative frequencies of entries")+ facet_wrap(.~df6$churn)+theme_bw() +scale_fill_brewer(palette="Paired") + theme(plot.title=element_text(hjust=0.5))
+Z
+
+
+#Distribution of accesses per hour
+
+dati_completi$orai=paste(dati_completi$orai, ':00', sep = '') 
+dati_completi$orai=times(dati_completi$orai)
+class(dati_completi$orai)
+
+hour=as.numeric(gsub("\\:.*$", "", dati_completi$orai))
+categories=with(dati_completi,  ifelse(hour >= 0 & hour<=8, "early morning (0 AM - 8 AM)",
+                           ifelse(hour>8 & hour<=12, "morning (8 AM - 12 AM)",ifelse(hour>12 & hour<=19,"evening (12 PM - 7 PM)","night (7 PM - 24 PM)"))))
+dati_completi3=dati_completi
+dati_completi3$categories=categories
+
+
+df4=dati_completi3 %>% count(giorno,categories) %>% group_by(giorno) %>% mutate(prop = n / sum(n))
+
+ggplot(data =df4 , aes(x = df4$categories,y=prop)) + geom_bar(aes(fill = df4$categories),stat="identity")+labs(fill = "Fasce orario")+ facet_wrap(.~df4$giorno)+theme_bw()+
+  labs(title="Fasce orarie per giorni della settimana ",x ="Giorni della settimana ", y = "Frequenze relative")+theme(axis.text.x=element_blank(),plot.title = element_text(hjust = 0.5),panel.background = element_rect(colour = 'grey90', fill ="#f5f5f2"))#+scale_fill_brewer( palette = 9, direction = 1,
+
+########months#####
+dati_grafico=dati_completi
+class(dati_grafico$datai)
+dati_grafico$mesi=months(as.Date(dati_grafico$datai))
+codcliente=dati$codcliente
+churn=dati$si2014
+dati_grafico2=data.frame(codcliente,churn)
+dati_grafico$mesi=factor(dati_grafico$mesi,levels=c("January","February","March","April" ,"May","June","July","August","September" ,"October","November","December" ))
+levels(dati_grafico$mesi)
+dati_grafico2=merge(dati_grafico,dati_grafico2,by="codcliente")
+
+
+df11=dati_grafico2%>% count(churn,mesi) %>% group_by(churn) %>% mutate(prop = n / sum(n))
+df11$churn=ifelse(df11$churn==0,"Non_Rinnovo", "Rinnovo")
+
+Z=ggplot(df11,aes(x=df11$mesi,y=df11$prop))+geom_bar(aes(fill=df11$mesi),stat="identity")+labs(fill="Giorni della settimana")+labs(title="Frequenza degli ingressi nell'arco dell'anno per rinnovo", x="Mesi dell'anno",y="Ingressi")+ facet_wrap(.~df11$churn)+theme_bw() +scale_fill_brewer(palette="Paired") + theme(plot.title=element_text(hjust=0.5))
+Z
+
+####################discounts##########
+
+dati$sconto_d=ifelse(dati$sconto=="NESSUNO SCONTO",0,1)  
+
+df12=dati %>% count(sconto_d,si2014) %>% group_by(sconto_d) %>% mutate(prop = n / sum(n))
+df12$sconto_d=ifelse(df12$sconto_d==0,"No discount", "Discount")
+d=ggplot(data = df12, aes(x = as.factor(df12$si2014),y=prop)) + geom_bar(aes(fill = as.factor(df12$si2014)),stat="identity")+labs(fill = "Renewal")+ facet_wrap(.~df12$sconto_d)+theme_bw()+
+  labs(title="Renewal by discount", x ="Discount", y = "Relative frequencies")
+r=d+theme(plot.title = element_text(hjust = 0.5),panel.background = element_rect(colour = 'grey90', fill ="#f5f5f2"))+scale_colour_manual(values = brewer.pal(8, "Accent")[c(3,7)],aesthetics = "fill")
+r
+
+levels(dati$sconto)
+
+levels(dati$sconto)
+
+table(dati$sconto)
+summary(dati$sconto)
+
+dati$sconto_d=ifelse(dati$sconto=="NESSUNO SCONTO",0,1)                 #dummies utile per glm
+
+dati$nuovo_abb_d=ifelse(dati$nuovo_abb=="NUOVO ABBONATO",1,0)           
+
+levels(dati$riduzione)
+table(dati$riduzione)
+student_index=which(dati$riduzione=="ABBONAMENTO MUSEI su carte EDISU")
+dim(dati[student_index,])   #solamente 197 studenti?
+
+
+#######which are the most popular museums?#######
+
+
+table(dati_completi$museo)
+df=dati_completi %>% 
+  group_by(museo) %>%
+  summarise(count= n())
+
+dati_musei=df %>%
+  arrange(-count) 
+  
+
+dati_musei=dati_musei[1:25,]
+levels(dati_musei$museo)
+dati_musei$museo= factor(dati_musei$museo, levels=unique(dati_musei$museo[order(dati_musei$count)]), ordered=TRUE)
+
+
+p_musei = ggplot(dati_musei, aes(x=dati_musei$museo, y=dati_musei$count)) +
+  geom_segment( aes(x=dati_musei$museo, xend=dati_musei$museo, y=0, yend=dati_musei$count ), color="skyblue" ) +
+  geom_point( color="blue", size=4, alpha=0.6)+
+  theme_light() +
+  coord_flip() +
+  theme(
+    legend.position="none",
+    panel.grid.major.y = element_blank(),
+    panel.border = element_blank(),
+    axis.ticks.y = element_blank(),
+    plot.title = element_text(hjust = 0.5),
+    panel.background = element_rect(colour = 'grey90', fill ="#f5f5f2")
+    
+  )+
+  xlab("") +
+  ylab("Number of visits")+
+  ggtitle("The 25 most visited museums in 2013")
+
+p_musei
+names(dati_completi)
+
+dati_ingressi_unici=dati_completi %>%
+  group_by(codcliente) %>%
+  mutate(numero_ingressi_unici = n_distinct(museo))%>%
+  select(-(data_inizio:giorno)) %>%
+  filter (! duplicated(codcliente))
+
+dati=merge(dati,dati_ingressi_unici, by="codcliente",all.x=T)
+
+
+
+
+
+df6=dati %>% count(si2014,numero_ingressi_unici) %>% group_by(si2014) %>% mutate(prop = n / sum(n))
+
+d5=ggplot(data = df6, aes(x = df6$numero_ingressi_unici,y=prop)) + geom_bar(aes(fill = as.factor(df6$si2014)),stat="identity")+labs(fill = "Rinnovo")+ facet_wrap(.~df6$si2014)+theme_bw()+
+  labs(title="Numero ingressi unici per rinnovo",x ="Numero di ingressi unici", y = "Frequenze relative")+xlim(0,40)
+
+d55=d5+theme(plot.title = element_text(hjust = 0.5),panel.background = element_rect(colour = 'grey90', fill ="#f5f5f2"))#+scale_fill_brewer( palette = 9, direction = 1,
+ggplotly(d55)
+summary(df6$numero_ingressi_unici[which(df6$si2014==1)])#coloro che rinnovano
+summary(df6$numero_ingressi_unici[which(df6$si2014==0)])#coloro che non rinnovano
+
+
+
+d_costi_entrate=dati_completi %>% 
+  group_by(codcliente) %>%
+  summarise(costi_entrate= sum(importo.y))
+
+dati=merge(dati,d_costi_entrate,by="codcliente",all.x=T)
+
+
+MO=ggplot(data=dati,aes(x=dati$costi_entrate, group=as.factor(dati$si2014), fill=as.factor(dati$si2014))) + geom_density(adjust=1.2 ,alpha=0.65)+xlim(0,250)+labs(fill = "Renewal")+
+  labs(title="Distribution of entry costs by renewal",x ="Entry costs", y = "Density")+theme(plot.title = element_text(hjust = 0.5),panel.background = element_rect(colour = 'grey90', fill ="#f5f5f2"))+scale_colour_manual(values = brewer.pal(8, "Accent")[4:5],aesthetics = "fill")
+MO
+
+
+
+###########Descriptive tables of the individuals who do not have any visits#######
+##useful to check whether it is appropriate to think about a Heckman Selection
+
+indica=which(dati$count==0)
+dati_nessuna_visita=dati[indica,]
+
+table(dati_nessuna_visita$si2014)
+
+table(dati_nessuna_visita$sesso)
+#prevalentemente donne
+table(dati_nessuna_visita$sconto_d)#maggioranza ha ricevuto sconti
+
+table(dati_nessuna_visita$sesso,dati_nessuna_visita$si2014)
+
+table(dati_nessuna_visita$classi_eta)#over 60 prevalgono
+
+
+
+######SOM#########
+
+
+require(kohonen)
+library(fastDummies)
+library(DMwR)
+require(tidyverse)
+require(magrittr)
+library(RColorBrewer)
+
+
+
+data_id=dati
+
+data_id$Torino=ifelse(data_id$cap>=10121 & data_id$cap<=10156,1,0)
+data_id=dummy_cols(data_id,select_columns = "tipo_pag")
+
+
+data_id$genere_d=ifelse(data_id$sesso=="M",1,0)
+labels(data_id)
+
+data_som=data_id[,c("codcliente" ,"importo", "genere_d", "costi_entrate" ,"eta","sconto_d","Torino","count","si2014","numero_ingressi_unici")]
+
+dim(data_som)
+
+n <- 60
+qual_col_pals = brewer.pal.info[brewer.pal.info$category == 'qual',]
+col_vector = unlist(mapply(brewer.pal, qual_col_pals$maxcolors, rownames(qual_col_pals)))
+data_som=na.omit(data_som) 
+
+data =data_som
+map_dimension = 20 #20X20
+
+n_iterations = 1000
+
+recalculate_map = T
+
+recalculate_no_clusters = T
+
+
+numerics = summarise_all( data, is.numeric ) %>%
+  as.logical()
+
+numerics = names(data)%>%
+  .[numerics]
+
+data_list = list()
+distances = vector()
+
+data_list[['numerics']] = scale(data[,numerics][,-1])
+distances = c(  'euclidean')
+
+str(data_list)
+
+som_grid = kohonen::somgrid(xdim = map_dimension
+                            , ydim=map_dimension
+                            , topo="hexagonal")
+
+som_modello = kohonen::supersom( data_list
+                       , grid=som_grid
+                       , rlen= n_iterations
+                       , alpha = 0.05
+                       , whatmap = c( 'numerics')
+                       , dist.fcts = distances)
+
+
+
+plot(som_modello, type="changes")
+plot(som_modello, type="counts")
+plot(som_modello, type="dist.neighbours")
+plot(som_modello, type="codes",main="Codes")
+
+
+codes = tibble( layers = names(som_modello$codes)
+                ,codes = som_modello$codes ) %>%
+  mutate( codes = purrr::map(codes, as_tibble) ) %>%
+  spread( key = layers, value = codes) %>%
+  apply(1, bind_cols) %>%
+  .[[1]] %>%
+  as_tibble()
+
+#matrice delle distanze che verrà utilizzato per codes.
+dist_m = dist(codes) %>%
+  as.matrix()
+
+
+dist_on_map = kohonen::unit.distances(som_grid)
+
+
+dist_adj = dist_m ^ dist_on_map
+
+factoextra::fviz_nbclust(dist_adj
+                         , factoextra::hcut
+                         , method = "wss"
+                         , hc_method = 'ward.D2'
+                         , k.max = 15) 
+clust_adj = hclust(as.dist(dist_adj), 'ward.D2')
+
+#from the joint study it results that the number of clusters oscillates between 3 and 4; the highest one will be chosen because it perfectly identifies a cluster with preponderance of churn
+
+som_cluster_adj = cutree(clust_adj, 4)
+
+plot(som_modello, type="codes", main = "Clusters", bgcol = col_vector[som_cluster_adj], pchs = NA)
+add.cluster.boundaries(som_modello, som_cluster_adj)
+
+
+
+data.frame(som_modello$data)
+length(som_modello$unit.classif)
+
+data_som$nodo=as.numeric(som_modello$unit.classif)
+as.numeric(som_cluster_adj)
+nodo=seq(from=1,to=400,by=1)
+A=data.frame(nodo,som_cluster_adj)
+data_som=merge(data_som,A,by="nodo",all.x=T)
+table(data_som$som_cluster_adj.x,data_som$som_cluster_adj.y)
+
+df5=data_som %>% count(som_cluster_adj,si2014) %>% group_by(som_cluster_adj) %>% mutate(prop = n / sum(n))
+df5
+
+##################### CLusters analysis##
+
+data_som$genere_d=ifelse(data_som$genere_d==1,"M","F")
+
+genere=data_som %>% count(som_cluster_adj,genere_d) %>% group_by(som_cluster_adj) %>% mutate(prop = n / sum(n))
+genere
+
+
+do=ggplot(data = genere, aes(x = genere$genere_d,y=prop)) + geom_bar(aes(fill = genere$genere_d),stat="identity")+labs(fill = "Gender")+ facet_wrap(.~genere$som_cluster_adj)+theme_bw()+
+  labs(title="Gender by cluster", x ="Cluster", y = "Relative frequencies")#+geom_text(aes(label = value), vjust = -0.3) 
+ro=do+theme(axis.text.x=element_blank(),plot.title = element_text(hjust = 0.5),panel.background = element_rect(colour = 'grey90', fill ="#f5f5f2"))+scale_fill_brewer( palette = 10, direction = 1,aesthetics = "fill")
+ro
+
+#distribuzione churn per cluster
+data_som$si2014=ifelse(data_som$si2014==0,"Yes","No")
+nochurn=data_som %>% count(som_cluster_adj,si2014) %>% group_by(som_cluster_adj) %>% mutate(prop = n / sum(n))
+nochurn
+
+
+mo=ggplot(data = nochurn, aes(x = nochurn$si2014,y=prop)) + geom_bar(aes(fill = nochurn$si2014),stat="identity")+labs(fill = "Churn")+ facet_wrap(.~nochurn$som_cluster_adj)+theme_bw()+
+  labs(title="Churn by cluster", x ="Cluster", y = "Relative frequencies")#+geom_text(aes(label = value), vjust = -0.3) 
+rr=mo+theme(axis.text.x=element_blank(),plot.title = element_text(hjust = 0.5),panel.background = element_rect(colour = 'grey90', fill ="#f5f5f2"))+scale_fill_brewer( palette = 3, direction = 1,aesthetics = "fill")
+rr
+
+#distribuzione sconto_d
+data_som$sconto_d=ifelse(data_som$sconto_d==1,"Yes","No")
+sconto=data_som %>% count(som_cluster_adj,sconto_d) %>% group_by(som_cluster_adj) %>% mutate(prop = n / sum(n))
+
+rt=ggplot(data = sconto, aes(x = sconto$sconto_d,y=prop)) + geom_bar(aes(fill = sconto$sconto_d),stat="identity")+labs(fill = "Discount")+ facet_wrap(.~sconto$som_cluster_adj)+theme_bw()+
+  labs(title="Discount by cluster", x ="Cluster", y = "Frequenze relative")#+geom_text(aes(label = value), vjust = -0.3) 
+ert=rt+theme(axis.text.x=element_blank(),plot.title = element_text(hjust = 0.5),panel.background = element_rect(colour = 'grey90', fill ="#f5f5f2"))+scale_fill_brewer( palette = 8, direction = 1,aesthetics = "fill")
+ert
+
+
+
+anni=data_som %>% count(som_cluster_adj,eta) %>% group_by(som_cluster_adj) %>% mutate(prop = n / sum(n))
+
+mean_anni=data_som%>%
+  group_by(som_cluster_adj) %>%
+  summarize(mean = mean(eta))
+
+anni=merge(anni,mean_anni,by="som_cluster_adj")
+
+ggplot(anni, aes(x = anni$eta,y=anni$prop))+geom_histogram(aes(color =as.factor(anni$som_cluster_adj)), fill = "white", bins = 10,stat="identity")+xlim(0,100)+facet_wrap(.~as.factor(anni$som_cluster_adj)) +
+  geom_vline(aes(xintercept = mean, group = som_cluster_adj), colour = 'black', linetype='dashed')+labs(colour= "Cluster",linetype="Age")+labs(title="Age by cluster", x ="Age", y = "Relative frequencies ")+
+  theme(plot.title = element_text(hjust = 0.5),panel.background = element_rect(colour = 'grey90', fill ="#f5f5f2"))
+
+
+
+#distribuzione residenza per cluster (Torino)
+citta=data_som %>% count(som_cluster_adj,Torino) %>% group_by(som_cluster_adj) %>% mutate(prop = n / sum(n))
+citta
+
+citta$Torino=ifelse(citta$Torino==1,"Yes","No")
+dd=ggplot(data = citta, aes(x = citta$Torino,y=prop)) + geom_bar(aes(fill =as.factor( citta$Torino)),stat="identity")+labs(fill = "Torino")+ facet_wrap(.~citta$som_cluster_adj)+theme_bw()+
+  labs(title="Living in Turin (dummy) by cluster", x ="Torino", y = "Relative frequencies")#+geom_text(aes(label = value), vjust = -0.3) 
+dd+theme(plot.title = element_text(hjust = 0.5),panel.background = element_rect(colour = 'grey90', fill ="#f5f5f2"))
+
+
+
+
+
+entrate=data_som %>% count(som_cluster_adj,count) %>% group_by(som_cluster_adj) %>% mutate(prop = n / sum(n))
+
+mean_entrate=data_som%>%
+  group_by(som_cluster_adj) %>%
+  summarize(mean = mean(count))
+entrate=merge(entrate,mean_entrate,by="som_cluster_adj")
+
+ggplot(entrate, aes(x = entrate$count,y=entrate$prop))+geom_histogram(aes(color =as.factor(entrate$som_cluster_adj)), fill = "white", bins = 10,stat="identity")+xlim(0,100)+facet_wrap(.~as.factor(entrate$som_cluster_adj)) +labs(title="Number of visits by cluster", x ="Number of visits ", y = "Relative frequencies")+labs(colour= "Cluster")+
+  geom_vline(aes(xintercept = mean, group = som_cluster_adj), colour = 'black',linetype='dashed')+
+  theme(plot.title = element_text(hjust = 0.5),panel.background = element_rect(colour = 'grey90', fill ="#f5f5f2"))
+
+
+
+
+costi_entrate1=data_som %>% count(som_cluster_adj,costi_entrate) %>% group_by(som_cluster_adj) %>% mutate(prop = n / sum(n))
+
+mean_costi_entrate=data_som%>%
+  group_by(som_cluster_adj) %>%
+  summarize(mean = mean(costi_entrate))
+
+costi_entrate1=merge(costi_entrate1,mean_costi_entrate,by="som_cluster_adj")
+
+ggplot(costi_entrate1, aes(x = costi_entrate1$costi_entrate,y=prop))+geom_histogram(aes(color =as.factor(costi_entrate1$som_cluster_adj)), fill = "white", bins = 10,stat="identity")+facet_wrap(.~as.factor(costi_entrate1$som_cluster_adj))+xlim(0,500) +labs(title="Cost for Cluster", x ="Cost", y = "Frequenze relative")+labs(colour= "Cluster")+
+  geom_vline(aes(xintercept = mean, group = som_cluster_adj), colour = 'black',linetype='dashed')+
+  theme(plot.title = element_text(hjust = 0.5),panel.background = element_rect(colour = 'grey90', fill ="#f5f5f2"))
+
+
+
+
+
+
+############## GEO MAPS#########
+
+
+
+
+
+
+data_count=dati %>%
+  group_by(IT_CAP) %>%
+  summarise(count= n())
+
+
+
+shape <-  readOGR("/Users/lorenzopicco/Desktop/CAP_NordOvest_Shp",layer ="cap_NO")
+shape@data$IT_CAP
+
+
+library(plyr)
+
+shape@data=data.frame(join(shape@data,data_count,by="IT_CAP"))
+
+spplot(shape,"count")
+
+gpclibPermit()
+
+shape=spTransform(shape,CRS("+init=epsg:4326"))
+mappa.points = fortify(shape, region="IT_CAP")
+mappa.points[6]
+colnames(mappa.points)[6]="IT_CAP"
+mappa.df = join(mappa.points, shape@data, by="IT_CAP")
+
+
+p= ggplot(data = mappa.df, aes(x=long, y=lat, group = group )) + 
+  geom_polygon(aes(fill=count), color = 'black') +
+  scale_fill_gradient(name = 'Absolute 
+frequencies',
+                      low = "goldenrod2", high = "red",na.value="cornsilk2")+labs(
+                        title = "Territorial distribution of holders of the Turin museum card in Northern Italy."
+
+                        
+              
+                      ) +theme(
+                        text = element_text(color = "#22211d"), 
+                        panel.background = element_rect(fill = "#f5f5f2", color = NA), 
+                        plot.title = element_text(hjust = 0.5),
+                        plot.subtitle = element_text(hjust = 0.5),
+                        
+                        panel.grid.major = element_line(color = "grey45"),
+                        panel.grid.minor = element_line(color = "grey25"),
+                        
+                        legend.background = element_rect(fill = "#f5f5f2", color = NA)
+                      )+north(mappa.df)
+
+p 
+ggplotly(p)
+shappi= readOGR("/Users/lorenzopicco/Desktop/CAP_NordOvest_Shp",layer ="cap_NO")
+
+shappiTO=subset(shappi,IT_CAP>=10121 & IT_CAP<=10156)
+shappiTO@data=data.frame(join(shappiTO@data,data_count,by="IT_CAP"))
+
+spplot(shappiTO,"count" )
+
+
+
+mappaTO = fortify(shappiTO, region="IT_CAP")
+colnames(mappaTO)[6]="IT_CAP"
+mappa.TO = join(mappaTO, shappiTO@data, by="IT_CAP")
+
+p1= ggplot(data = mappa.TO, aes(x=long, y=lat, group = group)) + 
+  
+  geom_polygon(aes(fill=count), color = 'black') +
+  scale_fill_gradient(name = 'Absolute 
+frequencies',
+                      low = "gold", high = "red",na.value="cornsilk2")+
+  theme(
+    text = element_text(color = "#22211d"), 
+    panel.background = element_rect(fill = "#f5f5f2", color = NA), 
+    plot.title = element_text(hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5),
+    
+    panel.grid.major = element_line(color = "grey45"),
+    panel.grid.minor = element_line(color = "grey25"),
+    
+    legend.background = element_rect(fill = "#f5f5f2", color = NA))+labs(
+      title = "Territorial distribution of museum card holders living in Turin")+
+  north(mappa.TO)
+
+p1
+ggplotly(p1)
+
+
+
+shappi= readOGR("/Users/lorenzopicco/Desktop/CAP_NordOvest_Shp",layer ="cap_NO")
+
+shappiTO=subset(shappi,IT_CAP>=10121 & IT_CAP<=10156)
+shappiTO@data=data.frame(join(shappiTO@data,data_count,by="IT_CAP"))
+shappiTO=spTransform(shappiTO,CRS("+init=epsg:4326"))
+mappaTO = fortify(shappiTO, region="IT_CAP")
+colnames(mappaTO)[6]="IT_CAP"
+mappa.TO = join(mappaTO, shappiTO@data, by="IT_CAP")
+#occorre una versione di ggmap successiva 3/10/18
+library(devtools)
+if(!requireNamespace("devtools")) install.packages("devtools")
+devtools::install_github("dkahle/ggmap", ref = "tidyup")
+
+
+
+
+library(ggmap)
+
+
+register_google(key = "AIzaSyAwvKRW_Hz6PIC6QfXM1LAlwPitG_lUtEM",  #  Maps API key
+                account_type = "standard")
+
+
+
+Tor=get_map(location = c(lon=7.68682,lat=45.0704900), zoom = 12, maptype = 'terrain')
+
+To_ma=ggmap(Tor,extent="device",legend="bottomright")
+
+TO=To_ma+geom_polygon(aes(x = long, y = lat, group = group,
+                       fill = count),data = mappa.TO,color="black",alpha = 0.8) +
+  scale_fill_gradient(name = 'Absolute 
+frequencies',low = "gold", high = "red",na.value="cornsilk2")+
+  theme(
+    text = element_text(color = "#22211d"), 
+    panel.background = element_rect(fill = "#f5f5f2", color = NA), 
+    plot.title = element_text(hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5),
+    
+    panel.grid.major = element_line(color = "grey45"),
+    panel.grid.minor = element_line(color = "grey25"),
+    
+    legend.background = element_rect(fill = "#f5f5f2", color = NA))+labs(
+      title = "Territorial distribution of museum card holders living in Turin")
+TO
+ggplotly(TO)
+detach(package:plyr)###conflitto con dplyr
+
+
+############### The graphs shown are repeated by dropout rate and number of visits
+
+
+data_conti=dati %>% 
+  group_by(IT_CAP)%>%
+  summarize(ingressi=sum(count))
+
+
+
+shape <-  readOGR("~/CAP_NordOvest_Shp",layer ="cap_NO")
+shape@data$IT_CAP
+
+
+library(plyr)
+
+shape@data=data.frame(join(shape@data,data_conti,by="IT_CAP"))
+
+spplot(shape,"ingressi")
+
+gpclibPermit()
+
+shape=spTransform(shape,CRS("+init=epsg:4326"))
+mappa.points = fortify(shape, region="IT_CAP")
+mappa.points[6]
+colnames(mappa.points)[6]="IT_CAP"
+mappa.df = join(mappa.points, shape@data, by="IT_CAP")
+
+
+p_ingressi_ita= ggplot(data = mappa.df, aes(x=long, y=lat, group = group )) + 
+  geom_polygon(aes(fill=ingressi), color = 'black') +
+  scale_fill_gradient(name = 'Frequenze 
+assoluta',
+                      low = "lightskyblue1", high = "navyblue",na.value="cornsilk2")+labs(
+                        title = "Distribuzione territoriale dei numeri di ingressi cumulati per CAP.",
+                        subtitle = "Il grafico riportato raffigura la distribuzione territoriale del numero di ingressi cumulato per CAP."
+                        
+                      ) +theme(
+                        text = element_text(color = "#22211d"), 
+                        panel.background = element_rect(fill = "#f5f5f2", color = NA), 
+                        
+                        
+                        panel.grid.major = element_line(color = "grey45"),
+                        panel.grid.minor = element_line(color = "grey25"),
+                        plot.title = element_text(hjust = 0.5),
+                        plot.subtitle = element_text(hjust = 0.5),
+                        legend.background = element_rect(fill = "#f5f5f2", color = NA)
+                      )+north(mappa.df)
+
+p_ingressi_ita
+
+ggplotly(p_ingressi_ita)
+
+
+
+shappi= readOGR("~/CAP_NordOvest_Shp",layer ="cap_NO")
+
+shappiTO=subset(shappi,IT_CAP>=10121 & IT_CAP<=10156)
+
+shappiTO@data=data.frame(join(shappiTO@data,data_conti,by="IT_CAP"))
+shappiTO=spTransform(shappiTO,CRS("+init=epsg:4326"))
+mappaTO = fortify(shappiTO, region="IT_CAP")
+colnames(mappaTO)[6]="IT_CAP"
+mappa.TO = join(mappaTO, shappiTO@data, by="IT_CAP")
+
+
+p_ingressi_to= ggplot(data = mappa.TO, aes(x=long, y=lat, group = group)) + 
+  
+  geom_polygon(aes(fill=ingressi), color = 'black') +
+  scale_fill_gradient(name = 'Absolute 
+frequencies',
+                      low = "gold1", high = "coral3",na.value="cornsilk2")+
+  theme(
+    text = element_text(color = "#22211d"), 
+    panel.background = element_rect(fill = "#f5f5f2", color = NA), 
+    plot.title = element_text(hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5),
+    
+    panel.grid.major = element_line(color = "grey45"),
+    panel.grid.minor = element_line(color = "grey25"),
+    
+    legend.background = element_rect(fill = "#f5f5f2", color = NA))+labs(
+      title = "Territorial distribution of the total entries for Turin inhabitants")+
+  north(mappa.TO)
+
+p_ingressi_to
+ggplotly(p_ingressi_to)
+
+
+
+detach(package:plyr)###conflitto con dplyr
+
+
+
+library(plyr)
+shappi= readOGR("~/CAP_NordOvest_Shp",layer ="cap_NO")
+
+shappiTO_prov=subset(shappi,IT_CAP>=10121 & IT_CAP<=10156|IT_CAP>=10010 & IT_CAP<=10099 )
+
+shappiTO_prov@data=data.frame(join(shappiTO_prov@data,data_conti,by="IT_CAP"))
+shappiTO_prov=spTransform(shappiTO_prov,CRS("+init=epsg:4326"))
+mappaTO_prov = fortify(shappiTO_prov, region="IT_CAP")
+colnames(mappaTO_prov)[6]="IT_CAP"
+mappa.TO_prov = join(mappaTO_prov, shappiTO_prov@data, by="IT_CAP")
+
+
+p_ingressi_TO_prov= ggplot(data = mappa.TO_prov, aes(x=long, y=lat, group = group)) + 
+  
+  geom_polygon(aes(fill=ingressi), color = 'black') +
+  scale_fill_gradient(name = 'Frequenza 
+                      assoluta',
+                      low = "gold1", high = "coral3",na.value="cornsilk2")+
+  theme(
+    text = element_text(color = "#22211d"), 
+    panel.background = element_rect(fill = "#f5f5f2", color = NA), 
+    plot.title = element_text(hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5),
+    
+    panel.grid.major = element_line(color = "grey45"),
+    panel.grid.minor = element_line(color = "grey25"),
+    
+    legend.background = element_rect(fill = "#f5f5f2", color = NA))+labs(
+      title = "Distribuzione territoriale dei numeri di ingressi cumulati per i residenti a Torino e provincia")+
+  north(mappa.TO_prov)
+
+p_ingressi_TO_prov
+ggplotly(p_ingressi_TO_prov)
+
+detach(package:plyr)
+
+
+
+
+
+########################GROUP PER CAP AND I WONDER HOW THE DROPOUT RATIO IS DISLOCATED.
+
+
+data_count=dati %>%
+  group_by(IT_CAP) %>%
+  summarise(count= n())
+
+
+data_churn=dati %>%
+  group_by(IT_CAP) %>%
+  summarise(not_churn=sum(si2014))
+
+data_fidelity=merge(data_count,data_churn,by="IT_CAP")
+data_fidelity_TO=subset(data_fidelity,IT_CAP>=10121 & IT_CAP<=10156)
+
+dim(data_fidelity_TO)
+
+
+data_fidelity$prop_churn=1-(data_fidelity$not_churn/data_fidelity$count)
+
+
+shape <-  readOGR("~/CAP_NordOvest_Shp",layer ="cap_NO")
+shape@data$IT_CAP
+
+library(plyr)
+
+shape@data=data.frame(join(shape@data,data_fidelity,by="IT_CAP"))
+
+spplot(shape,"prop_churn")
+
+gpclibPermit()
+
+shape=spTransform(shape,CRS("+init=epsg:4326"))
+mappa.points = fortify(shape, region="IT_CAP")
+mappa.points[6]
+colnames(mappa.points)[6]="IT_CAP"
+mappa.df = join(mappa.points, shape@data, by="IT_CAP")
+
+
+p_propchurn_ita= ggplot(data = mappa.df, aes(x=long, y=lat, group = group )) + 
+  geom_polygon(aes(fill=prop_churn), color = 'black') +
+  scale_fill_gradient(name = 'Frequenze 
+relative',
+                      low = "lightskyblue1", high = "navyblue",na.value="cornsilk2")+labs(
+                        title = "Distribuzione territoriale delle frequenze relative di non rinnovo tessera per CAP."
+                        
+                      ) +theme(
+                        text = element_text(color = "#22211d"), 
+                        panel.background = element_rect(fill = "#f5f5f2", color = NA), 
+                        
+                        
+                        panel.grid.major = element_line(color = "grey45"),
+                        panel.grid.minor = element_line(color = "grey25"),
+                        plot.title = element_text(hjust = 0.5),
+                        plot.subtitle = element_text(hjust = 0.5),
+                        legend.background = element_rect(fill = "#f5f5f2", color = NA)
+                      )+north(mappa.df)
+
+p_propchurn_ita
+
+ggplotly(p_propchurn_ita)
+
+
+shappi= readOGR("~/CAP_NordOvest_Shp",layer ="cap_NO")
+
+shappiTO=subset(shappi,IT_CAP>=10121 & IT_CAP<=10156)
+
+shappiTO@data=data.frame(join(shappiTO@data,data_fidelity,by="IT_CAP"))
+shappiTO=spTransform(shappiTO,CRS("+init=epsg:4326"))
+mappaTO = fortify(shappiTO, region="IT_CAP")
+colnames(mappaTO)[6]="IT_CAP"
+mappa.TO = join(mappaTO, shappiTO@data, by="IT_CAP")
+
+
+p_prop_churn_to= ggplot(data = mappa.TO, aes(x=long, y=lat, group = group)) + 
+  
+  geom_polygon(aes(fill=prop_churn), color = 'black') +
+  scale_fill_gradient(name = 'Relative 
+frequencies',
+                      low = "lightskyblue1", high = "navyblue",na.value="cornsilk2")+
+  theme(
+    text = element_text(color = "#22211d"), 
+    panel.background = element_rect(fill = "#f5f5f2", color = NA), 
+    plot.title = element_text(hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5),
+    
+    panel.grid.major = element_line(color = "grey45"),
+    panel.grid.minor = element_line(color = "grey25"),
+    
+    legend.background = element_rect(fill = "#f5f5f2", color = NA))+labs(
+      title = "Distribution of churn relative frequencies for Turin Cap")+
+  north(mappa.TO)
+
+p_prop_churn_to
+ggplotly(p_prop_churn_to)
+
+
+###################### NETWORK ANALYSIS ##################
+
+#To speed up the reading and execution of the code, all the parts in the comments have been saved separately in the attached folder.
+
+
+# dato_network=read.csv("~/in13.csv")
+# dato_network=dato_network[,-1]
+# names(dato_network)[3]="importo_ingresso"
+# names(dato_network)[7]="codcliente"
+# codcliente=dato_network$codcliente
+# datai=dato_network$datai
+# orai=dato_network$orai
+# museo=dato_network$museo
+# menodati=data.frame(codcliente,datai,orai,museo)
+# 
+# menodati$datai=as.Date(menodati$datai,format="%d/%m/%Y")
+# class(menodati$datai)
+# class(menodati$orai)
+# t=as.POSIXct(menodati$orai,format="%H:%M")
+# t=lubridate::floor_date(t, "5 minutes")
+# menodati$orai=strftime(t, format="%H:%M")
+# 
+# menodati$orai=as.character(menodati$orai)
+# 
+# menodati$orai=paste(menodati$orai, ':00', sep = '') 
+# menodati$orai=times(menodati$orai)
+# class(menodati$orai)
+# 
+# library(plyr)
+# itemList=ddply(menodati,c("orai","datai","museo"), 
+#                function(df1)paste(df1$codcliente, 
+#                                   collapse = ","))
+# detach(package:plyr)
+# 
+# 
+# itemList$orai=NULL
+# itemList$datai=NULL
+# itemList$museo=NULL
+# colnames(itemList)=c("items")
+# 
+# 
+# write.csv(itemList,"Id_5_min.csv", quote = FALSE, row.names = TRUE)
+
+
+tr=read.transactions(file.choose(), format = 'basket', sep=',') #"Id_5_min.csv"
+summary(tr)
+
+rules=apriori(tr, parameter = list(supp=.0001, conf=0.80))
+rules=sort(rules, by='confidence', decreasing = TRUE)
+summary(rules)
+
+inspect(rules[1:100])
+
+summary(rules)
+
+
+# class(itemList)
+# 
+# lista=strsplit(unlist(itemList), "\\, |\\,| ") 
+# class(lista)
+# lunghezza=lengths(lista)
+# 
+# lista=lista[lunghezza>1]
+# vettore_id_ingressi=as.numeric(unlist(lista))
+# data_table=data.frame(table(vettore_id_ingressi))
+# colnames(data_table)[1]="codcliente"
+# colnames(data_table)[2]="ingressi_condivisi"
+# 
+# 
+# 
+# data_table$ingressi_condivisi=ifelse(data_table$ingressi_condivisi<=2,0,data_table$ingressi_condivisi)
+# write.csv(data_table,"data_table_5min.csv", quote = FALSE, row.names = TRUE)
+# 
+# data_table
+# 
+# n.obs =sapply(lista, length)
+# seq.max=seq_len(max(n.obs))
+# 
+# matrix=t(sapply(lista, "[", i = seq.max))
+# dim(matrix)#120372    116
+# matrix=mapply(matrix, FUN=as.numeric)
+# matrix=matrix(data=matrix, ncol=116, nrow=120372)
+# matrix=t(matrix)
+#  dim(matrix)
+# rr=as.data.frame(matrix)
+# # 
+# # 
+# # 
+#  dat=data.frame()
+# # 
+# # 
+# for(i in 1:dim(matrix)[2]){
+#    conto=length(matrix[,i])-sum(is.na(matrix[,i]))
+# A=data.frame(table(rr[,i]))
+# B=data.frame(A,conto)
+# dat=rbind(dat,B)
+# }
+# # 
+# # 
+# # 
+# ssdd=dat%>%
+#   group_by(Var1) %>%
+#    summarise(Freq=sum(Freq), 
+#             somma_persone=sum((conto)))
+# # 
+# # 
+# ssdd
+# ssdd$index=ssdd$somma_persone/ssdd$Freq  #non normalizzo l'indicatore e guardiamo l'effetto dell'indice.
+# # 
+# colnames(ssdd)[1]="codcliente"
+# ssdd=ssdd[,-2]
+# ssdd=ssdd[,-2]
+# tabella_entrate_condivise_indice=ssdd
+# 
+# 
+# write.csv(tabella_entrate_condivise_indice,"Tabella_network_5min.csv", quote = FALSE, row.names = TRUE)
+# 
+# 
+# 
+# 
+# 
+#  itemList=as.data.frame(itemList)
+#  colnames(itemList)[1]="items"
+# oggetti=itemList
+#  oggetti$riga=seq(1,dim(oggetti)[1],1)
+#  s <- strsplit(as.character(oggetti$items), ',')
+# datone=data.frame(item=unlist(s), row=rep(oggetti$riga, sapply(s, FUN=length)))
+# 
+#  vettore_id=data_table$codcliente
+#  dataset_persone_diverse=matrix(NA, nrow = length(vettore_id), ncol = 2)
+# # 
+# # 
+#  for(i in 1:length(vettore_id)){
+#   id=vettore_id[i]
+#   test=datone %>% 
+#     filter(item==as.numeric(as.character(id)))
+#    df=test$row
+#    datone3=datone[datone$row %in% df,]
+#    differenti=datone3 %>%
+#      summarise(n_distinct(item))
+#    persone_diverse=as.numeric(differenti)-1
+#    dataset_persone_diverse[i,]=cbind(id,persone_diverse)
+#  }
+# dataset_persone_diverse=as.data.frame(dataset_persone_diverse)
+# colnames(dataset_persone_diverse)[1]="codcliente"
+# colnames(dataset_persone_diverse)[2]="numero_persone_diverse"
+# 
+# # 
+# # 
+#  write.csv(dataset_persone_diverse,"Tabella_persone_differenti_5min.csv", quote = FALSE, row.names = TRUE)
+# 
+
+data_table=read.csv(file.choose(),fileEncoding="latin1")#data_table_5min.csv
+data_table=data_table[,-1]
+
+tabella_entrate_condivise_indice=read.csv(file.choose(),fileEncoding="latin1")#Tabella_network_5min.csv
+tabella_entrate_condivise_indice=tabella_entrate_condivise_indice[,-1]
+data_table=merge(data_table,tabella_entrate_condivise_indice,by="codcliente")
+
+data_table
+
+
+tabella_persone_diverse=read.csv(file.choose(),fileEncoding="latin1")
+tabella_persone_diverse=tabella_persone_diverse[,-1]
+
+data_table_finale=merge(data_table,tabella_persone_diverse,by="codcliente")
+
+data_table_finale
+
+#Association Rules
+topRules <- rules[1:1000]
+
+
+plot(topRules, method="graph",control=list(type="codcliente"),engine="htmlwidget")
+
+plot(topRules, method = "grouped")
+
+
+
+subrules2 <- head(sort(rules, by="confidence"), 2000)
+ig <- plot( subrules2, method="graph", control=list(type="codcliente"))
+
+ig_df <- toVisNetworkData(ig, idToLabel = FALSE)
+
+visNetwork(ig_df$nodes, ig_df$edges,main="Network of card holders") %>% 
+  visNodes(size = 10) %>%
+  visLegend() %>%
+  visEdges(smooth = FALSE) %>%
+  visOptions(highlightNearest = TRUE, nodesIdSelection = TRUE) %>%
+  visInteraction(navigationButtons = TRUE) %>%
+  visEdges(arrows = 'from') %>%
+  visPhysics(
+    solver = "barnesHut",
+    maxVelocity = 35,
+    forceAtlas2Based = list(gravitationalConstant = -6000))
+FIRST CONSIDERATION IS THAT NOT ALL OF THEM ARE REUNITED AND GATHERING ONLY OUT OF CONFIDENCE, IT MEANS THAT THEY DID NOT ALWAYS GO TOGETHER (OR RATHER FEW REALLY GO TOGETHER ALL THE TIME).
+
+
+#######MUSEUMS######
+
+library(dplyr)
+library(lubridate)#serve per round
+library(chron)
+# dato_network2=read.csv("~in13.csv")
+# dato_network2=dato_network2[,-1]
+# names(dato_network2)[3]="importo_ingresso"
+# names(dato_network2)[7]="codcliente"
+# codcliente=dato_network2$codcliente
+# datai=dato_network2$datai
+# orai=dato_network2$orai
+# museo=dato_network2$museo
+# menodati=data.frame(codcliente,datai,orai,museo)
+# 
+# menodati$datai=as.Date(menodati$datai,format="%d/%m/%Y")
+# class(menodati$datai)
+# menodati$orai=as.character(menodati$orai)
+# menodati$orai=substr(as.character(menodati$orai),1,nchar(menodati$orai)-3) 
+# menodati$orai=paste(menodati$orai, ':00:00', sep = '') 
+# menodati$orai=times(menodati$orai)
+# class(menodati$orai)
+# 
+# library(plyr)
+# itemList=ddply(menodati,c("codcliente"), 
+#                function(df1)paste(df1$museo, 
+#                                   collapse = ","))
+# detach(package:plyr)
+# 
+# itemList$orai=NULL
+# itemList$datai=NULL
+# itemList$museo=NULL
+# colnames(itemList)=c("items")
+# 
+# write.csv(itemList,"Museo.csv", quote = FALSE, row.names = TRUE)
+
+
+tr=read.transactions(file.choose(), format = 'basket', sep=',')# Museo.csv
+
+rules=apriori(tr, parameter = list(supp=.0001, conf=0.8))
+rules=sort(rules, by='confidence', decreasing = TRUE)
+summary(rules)
+inspect(rules[1:10])
+topRules= rules[1:100]
+
+plot(topRules, method="graph",control=list(type="museo"),engine="htmlwidget")
+
+plot(topRules, method = "grouped")
+
+
+#Studio dei musei più gettonati.
+
+
+####### REGGIA DI VENARIA
+
+subrules2 <- head(sort(rules, by="confidence"),10)
+
+ig <- plot( subrules2, method="graph", control=list(type="museo") )
+ig_df <- get.data.frame( ig, what = "both" )
+
+subrules2 <- head(sort(rules, by="confidence"), 10)
+subrules2=subset(subrules2, subset=rhs %in% "REGGIA DI VENARIA REALE"  )
+ig <- plot( subrules2, method="graph", control=list(type="museo"))
+
+ig_df <- toVisNetworkData(ig, idToLabel = FALSE)
+
+visNetwork(ig_df$nodes, ig_df$edges,main="Network of the Reggia di Venaria Reale on the first 10 rules.") %>% 
+  visNodes(size = 10) %>%
+  visLegend() %>%
+  visEdges(smooth = FALSE) %>%
+  visOptions(highlightNearest = TRUE, nodesIdSelection = TRUE) %>%
+  visInteraction(navigationButtons = TRUE) %>%
+  visEdges(arrows = 'from') %>%
+  visPhysics(
+    solver = "barnesHut",
+    maxVelocity = 35,
+    forceAtlas2Based = list(gravitationalConstant = -6000))
+
+
+####MUSEO EGIZIO
+subrules2 <- head(sort(rules, by="confidence"),100)
+
+ig <- plot( subrules2, method="graph", control=list(type="museo") )
+ig_df <- get.data.frame( ig, what = "both" )
+
+subrules2 <- head(sort(rules, by="confidence"), 500)
+subrules2=subset(subrules2, subset=rhs %in% "MUSEO EGIZIO"  )
+ig <- plot( subrules2, method="graph", control=list(type="museo"))
+
+ig_df <- toVisNetworkData(ig, idToLabel = FALSE)
+
+visNetwork(ig_df$nodes, ig_df$edges,main="Network of the Museo Egizio on the first 500 rules") %>% 
+  visNodes(size = 10) %>%
+  visLegend() %>%
+  visEdges(smooth = FALSE) %>%
+  visOptions(highlightNearest = TRUE, nodesIdSelection = TRUE) %>%
+  visInteraction(navigationButtons = TRUE) %>%
+  visEdges(arrows = 'from') %>%
+  visPhysics(
+    solver = "barnesHut",
+    maxVelocity = 35,
+    forceAtlas2Based = list(gravitationalConstant = -6000))
+
+
+levels(dati_completi$museo)
+
+########### PALAZZO REALE
+
+subrules2 <- head(sort(rules, by="confidence"),100)
+
+ig <- plot( subrules2, method="graph", control=list(type="museo") )
+ig_df <- get.data.frame( ig, what = "both" )
+
+subrules2 <- head(sort(rules, by="confidence"), 100)
+subrules2=subset(subrules2, subset= rhs %in% "PALAZZO REALE"  )
+ig <- plot( subrules2, method="graph", control=list(type="museo"))
+
+ig_df <- toVisNetworkData(ig, idToLabel = FALSE)
+
+visNetwork(ig_df$nodes, ig_df$edges,main="Network of Royal Palace on the first 100 rules.") %>% 
+  visNodes(size = 10) %>%
+  visLegend() %>%
+  visEdges(smooth = FALSE) %>%
+  visOptions(highlightNearest = TRUE, nodesIdSelection = TRUE) %>%
+  visInteraction(navigationButtons = TRUE) %>%
+  visEdges(arrows = 'from') %>%
+  visPhysics(
+    solver = "barnesHut",
+    maxVelocity = 35,
+    forceAtlas2Based = list(gravitationalConstant = -6000))
+
+
+
+data_som=merge(data_som,data_table_finale,by="codcliente")
+names(data_som)
+
+condivisi=data_som %>% count(som_cluster_adj,ingressi_condivisi) %>% group_by(som_cluster_adj) %>% mutate(prop = n / sum(n))
+mean_condivisi=data_som%>%
+  group_by(som_cluster_adj) %>%
+  summarize(mean = mean(ingressi_condivisi))
+mean_condivisi
+
+ggplot(condivisi, aes(x = condivisi$ingressi_condivisi,y=condivisi$prop))+geom_histogram(aes(color =as.factor(condivisi$som_cluster_adj)), fill = "white", bins = 10,stat="identity")+facet_wrap(.~as.factor(condivisi$som_cluster_adj)) +
+  labs(colour= "Cluster",linetype="Et\uE0")+labs(title="Et\uE0 per cluster", x ="Et\uE0", y = "Frequenze relative")+
+  theme(plot.title = element_text(hjust = 0.5),panel.background = element_rect(colour = 'grey90', fill ="#f5f5f2"))
+
+#index:persone medie con le quali si è andati al museo per ogni id.
+
+persone_medie=data_som %>% count(som_cluster_adj,index) %>% group_by(som_cluster_adj) %>% mutate(prop = n / sum(n))
+
+mean_persone_medie=data_som%>%
+  group_by(som_cluster_adj) %>%
+  summarize(mean = mean(index))
+mean_persone_medie
+
+persone_diff=data_som %>% count(som_cluster_adj,numero_persone_diverse) %>% group_by(som_cluster_adj) %>% mutate(prop = n / sum(n))
+mean_persone_diff=data_som%>%
+  group_by(som_cluster_adj) %>%
+  summarize(mean = mean(numero_persone_diverse))
+mean_persone_diff
+
+################## GLM ##############
+
+dataset=dati
+
+dati=merge(dati,data_table_finale,by="codcliente",all.x=T)
+
+
+
+
+D=ggplot(data=dati,aes(x=dati$numero_persone_diverse, group=as.factor(dati$si2014), fill=as.factor(dati$si2014))) + geom_density(adjust=1.2 ,alpha=0.5)+xlim(0,75)+labs(fill = "Renewal")+
+  labs(title="Distribution of the number of different people who shared visits by renewal ",x ="Number of different accompanying people", y = "Density")+theme(plot.title = element_text(hjust = 0.5),panel.background = element_rect(colour = 'grey90', fill ="#f5f5f2"))
+D
+ggplotly(D)
+
+
+S=ggplot(data=dati,aes(x=dati$index, group=as.factor(dati$si2014), fill=as.factor(dati$si2014))) + geom_density(adjust=1.2 ,alpha=0.5)+xlim(0,100)+labs(fill = "Rinnovo")+
+  labs(title="Numero medio di persone andate assieme al museo per rinnovi",x ="Numero medio di persone andate al museo assieme", y = "Densit??")+theme(plot.title = element_text(hjust = 0.5),panel.background = element_rect(colour = 'grey90', fill ="#f5f5f2"))
+ggplotly(S)
+
+
+
+
+
+###
+dati$nord_Ovest=ifelse(dati$IT_CAP>0,1,0)
+dati$Torino=ifelse(dati$IT_CAP>=10121 & dati$IT_CAP<=10156,1,0)                                                                                                                                                                                                                                       
+dati$cintura_1=ifelse(dati$IT_CAP==10020|dati$IT_CAP==10023|dati$IT_CAP==10024|dati$IT_CAP==10025|dati$IT_CAP==10028|dati$IT_CAP==10036|dati$IT_CAP==10040|dati$IT_CAP==10042|dati$IT_CAP==10043|dati$IT_CAP==10044|dati$IT_CAP==10071|dati$IT_CAP==10072|dati$IT_CAP==10078|dati$IT_CAP==10091|dati$IT_CAP==10092|dati$IT_CAP==10093|dati$IT_CAP==10095|dati$IT_CAP==10098|dati$IT_CAP==10099,1,0)
+dati$cintura_2=ifelse(dati$IT_CAP==10022|dati$IT_CAP==10026|dati$IT_CAP==10029|dati$IT_CAP==10032|dati$IT_CAP==10034|dati$IT_CAP==10041|dati$IT_CAP==10045|dati$IT_CAP==10046|dati$IT_CAP==10048|dati$IT_CAP==10051|dati$IT_CAP==10060|dati$IT_CAP==10070|dati$IT_CAP==10073|dati$IT_CAP==10077|dati$IT_CAP==10088|dati$IT_CAP==10090,1,0)
+dati$altrove=ifelse(dati$Torino==0 & dati$cintura_1==0 & dati$cintura_2==0,1,0)
+dati$genere_M=ifelse(dati$sesso=="M",1,0)
+names(dati)
+dataset=dati[,c("importo", "sconto_d", "eta","count","genere_M","Torino","si2014","costi_entrate","cintura_1","cintura_2","altrove","ingressi_condivisi","index","numero_persone_diverse")]
+dataset=na.omit(dataset)
+names(dati)
+mylogit=glm(si2014  ~ importo + sconto_d + eta+count+genere_M+Torino+cintura_1+cintura_2+ingressi_condivisi+numero_persone_diverse+index, data = dataset, family = "binomial")
+#output glm
+
+summary(mylogit)
+exp(coef(mylogit))
+
+
+
+#Probability of renewal by age and Cap
+
+b0= mylogit$coef[1] 
+importo_pagato= mylogit$coef[2]
+sconto_d=mylogit$coef[3]
+eta=mylogit$coef[4]
+numero_visite=mylogit$coef[5]
+genere_M=mylogit$coef[6]
+Torino=mylogit$coef[7]
+cintura1=mylogit$coef[8]
+cintura2=mylogit$coef[9]
+numero_ingressi_condivisi=mylogit$coef[10]
+numero_persone_diverse =mylogit$coef[11]
+indice_di_betweenness=mylogit$coef[12]
+
+numero_visite_medio=mean(dataset$count)
+numero_visite_medio
+importo_medio=mean(dataset$importo)
+importo_medio
+numero_persone_diverse_medio=mean(dataset$numero_persone_diverse)
+numero_ingressi_condivisi_medio=mean(dataset$ingressi_condivisi)
+indice_medio_betweenness=mean(dataset$index)
+
+eta_seq=seq.int(from=1, to=100, by=1)
+
+logit1=(b0 + numero_visite*numero_visite_medio +importo_pagato*importo_medio +eta*eta_seq+numero_persone_diverse*numero_persone_diverse_medio+Torino*1 +cintura1*0 +cintura2*0 +genere_M*1 +sconto_d*1+numero_ingressi_condivisi*numero_ingressi_condivisi_medio+indice_di_betweenness*indice_medio_betweenness
+        )
+logit1
+logit2=(b0 + numero_visite*numero_visite_medio +importo_pagato*importo_medio +eta*eta_seq+numero_persone_diverse*numero_persone_diverse_medio+Torino*0 +cintura1*1 +cintura2*0 +genere_M*1 +sconto_d*1+numero_ingressi_condivisi*numero_ingressi_condivisi_medio+indice_di_betweenness*indice_medio_betweenness
+        )
+logit2
+logit3=(b0 + numero_visite*numero_visite_medio +importo_pagato*importo_medio +eta*eta_seq+numero_persone_diverse*numero_persone_diverse_medio+Torino*0 +cintura1*0 +cintura2*1 +genere_M*1 +sconto_d*1+numero_ingressi_condivisi*numero_ingressi_condivisi_medio+indice_di_betweenness*indice_medio_betweenness
+        )
+logit3
+logit4=(b0 + numero_visite*numero_visite_medio +importo_pagato*importo_medio +eta*eta_seq+numero_persone_diverse*numero_persone_diverse_medio+Torino*0 +cintura1*0 +cintura2*0 +genere_M*1 +sconto_d*1+numero_ingressi_condivisi*numero_ingressi_condivisi_medio+indice_di_betweenness*indice_medio_betweenness
+        )
+logit4
+
+logit5=(b0 + numero_visite*numero_visite_medio +importo_pagato*importo_medio +eta*eta_seq+numero_persone_diverse*numero_persone_diverse_medio+Torino*1 +cintura1*0 +cintura2*0 +genere_M*0 +sconto_d*1+numero_ingressi_condivisi*numero_ingressi_condivisi_medio+indice_di_betweenness*indice_medio_betweenness
+)
+logit5
+logit6=(b0 + numero_visite*numero_visite_medio +importo_pagato*importo_medio +eta*eta_seq+numero_persone_diverse*numero_persone_diverse_medio+Torino*0 +cintura1*1 +cintura2*0 +genere_M*0 +sconto_d*1+numero_ingressi_condivisi*numero_ingressi_condivisi_medio+indice_di_betweenness*indice_medio_betweenness
+)
+logit6
+logit7=(b0 + numero_visite*numero_visite_medio +importo_pagato*importo_medio +eta*eta_seq+numero_persone_diverse*numero_persone_diverse_medio+Torino*0 +cintura1*0 +cintura2*1 +genere_M*0 +sconto_d*1+numero_ingressi_condivisi*numero_ingressi_condivisi_medio+indice_di_betweenness*indice_medio_betweenness
+)
+logit7
+logit8=(b0 + numero_visite*numero_visite_medio +importo_pagato*importo_medio +eta*eta_seq+numero_persone_diverse*numero_persone_diverse_medio+Torino*0 +cintura1*0 +cintura2*0 +genere_M*0 +sconto_d*1+numero_ingressi_condivisi*numero_ingressi_condivisi_medio+indice_di_betweenness*indice_medio_betweenness
+)
+logit8
+
+
+uno_prob=exp(logit1)/(1 + exp(logit1))
+due_prob=exp(logit2)/(1 + exp(logit2))
+tre_prob=exp(logit3)/(1 + exp(logit3))
+quattro_prob=exp(logit4)/(1 + exp(logit4))
+cinque_prob=exp(logit5)/(1 + exp(logit5))
+sei_prob=exp(logit6)/(1 + exp(logit6))
+sette_prob=exp(logit7)/(1 + exp(logit7))
+otto_prob=exp(logit8)/(1 + exp(logit8))
+plot.logit.data=data.frame(Torino_centro_M=uno_prob, Prima_cintura_M=due_prob, Seconda_cintura_M=tre_prob, Altrove_M=quattro_prob,
+                           Torino_centro_F=cinque_prob, Prima_cintura_F=sei_prob, Seconda_cintura_F=sette_prob, Altrove_F=otto_prob,X=eta_seq)
+
+O=ggplot(plot.logit.data) + geom_line(aes(x=X,y=Torino_centro_F,colour="Torino centro",linetype="Woman")) + geom_line(aes(x=X,y=Prima_cintura_F,colour="Prima cintura",linetype="Woman"))+
+  geom_line(aes(x=X,y=Seconda_cintura_F,colour="Seconda cintura",linetype="Woman"))+geom_line(aes(x=X,y=Altrove_F,colour="Altrove",linetype="Woman"))+
+  geom_line(aes(x=X,y=Torino_centro_M,colour="Torino centro",linetype="Man")) + geom_line(aes(x=X,y=Prima_cintura_M,colour="Prima cintura",linetype="Man"))+
+geom_line(aes(x=X,y=Seconda_cintura_M,colour="Seconda cintura",linetype="Man"))+geom_line(aes(x=X,y=Altrove_M,colour="Altrove",linetype="Man"))+
+  labs(colour= "CAP",linetype="Gender")+
+  coord_cartesian(xlim=c(0,100),ylim=c(0.45,1))+
+  labs(x="Age", y="P(renewal)", title="Probability of renewal by age and Cap.")+theme(plot.title = element_text(hjust = 0.5),panel.grid.minor = element_line(size = 0.2,colour='white'),panel.background = element_rect(fill = 'gray90'))+scale_fill_brewer( palette = 9, direction = 1)
+O
+ggplotly(O)
+
+
+########## Probability of renewal by the number of visits and Cap
+
+count_seq=seq.int(from=0, to=20, by=1)
+eta_media=mean(dataset$eta)
+
+logit1=(b0  +importo_pagato*importo_medio +eta*eta_media+numero_persone_diverse*numero_persone_diverse_medio+Torino*1 +cintura1*0 +cintura2*0 +genere_M*1 +sconto_d*1+numero_ingressi_condivisi*numero_ingressi_condivisi_medio+numero_visite*count_seq+indice_medio_betweenness*indice_di_betweenness
+        )
+logit1
+logit2=(b0 +importo_pagato*importo_medio +eta*eta_media+numero_persone_diverse*numero_persone_diverse_medio+Torino*0 +cintura1*1 +cintura2*0 +genere_M*1 +sconto_d*1+numero_ingressi_condivisi*numero_ingressi_condivisi_medio+numero_visite*count_seq+indice_medio_betweenness*indice_di_betweenness
+        )
+logit2
+logit3=(b0 +importo_pagato*importo_medio+eta*eta_media+numero_persone_diverse*numero_persone_diverse_medio+Torino*0 +cintura1*0 +cintura2*1 +genere_M*1 +sconto_d*1+numero_ingressi_condivisi*numero_ingressi_condivisi_medio+numero_visite*count_seq+indice_medio_betweenness*indice_di_betweenness
+        )
+logit3
+logit4=(b0 +importo_pagato*importo_medio+eta*eta_media+numero_persone_diverse*numero_persone_diverse_medio+Torino*0 +cintura1*0 +cintura2*0 +genere_M*1 +sconto_d*1+numero_ingressi_condivisi*numero_ingressi_condivisi_medio+numero_visite*count_seq+indice_medio_betweenness*indice_di_betweenness)
+logit4
+
+logit5=(b0  +importo_pagato*importo_medio +eta*eta_media+numero_persone_diverse*numero_persone_diverse_medio+Torino*1 +cintura1*0 +cintura2*0 +genere_M*0 +sconto_d*1+numero_ingressi_condivisi*numero_ingressi_condivisi_medio+numero_visite*count_seq+indice_medio_betweenness*indice_di_betweenness
+)
+logit5
+logit6=(b0  +importo_pagato*importo_medio +eta*eta_media+numero_persone_diverse*numero_persone_diverse_medio+Torino*0 +cintura1*1 +cintura2*0 +genere_M*0 +sconto_d*1+numero_ingressi_condivisi*numero_ingressi_condivisi_medio+numero_visite*count_seq+indice_medio_betweenness*indice_di_betweenness)
+logit6
+logit7=(b0  +importo_pagato*importo_medio +eta*eta_media+numero_persone_diverse*numero_persone_diverse_medio+Torino*0 +cintura1*0 +cintura2*1 +genere_M*0 +sconto_d*1+numero_ingressi_condivisi*numero_ingressi_condivisi_medio+numero_visite*count_seq+indice_medio_betweenness*indice_di_betweenness)
+logit7
+logit8=(b0  +importo_pagato*importo_medio +eta*eta_media+numero_persone_diverse*numero_persone_diverse_medio+Torino*0 +cintura1*0 +cintura2*0 +genere_M*0 +sconto_d*1+numero_ingressi_condivisi*numero_ingressi_condivisi_medio+numero_visite*count_seq+indice_medio_betweenness*indice_di_betweenness)
+logit8
+
+
+
+
+uno_prob=exp(logit1)/(1 + exp(logit1))
+due_prob=exp(logit2)/(1 + exp(logit2))
+tre_prob=exp(logit3)/(1 + exp(logit3))
+quattro_prob=exp(logit4)/(1 + exp(logit4))
+cinque_prob=exp(logit5)/(1 + exp(logit5))
+sei_prob=exp(logit6)/(1 + exp(logit6))
+sette_prob=exp(logit7)/(1 + exp(logit7))
+otto_prob=exp(logit8)/(1 + exp(logit8))
+
+plot.logit.data2=data.frame(Torino_centro_M=uno_prob, Prima_cintura_M=due_prob, Seconda_cintura_M=tre_prob, Altrove_M=quattro_prob,
+                            Torino_centro_F=cinque_prob, Prima_cintura_F=sei_prob, Seconda_cintura_F=sette_prob, Altrove_F=otto_prob, X=count_seq)
+
+ggplot(plot.logit.data2) +geom_line(aes(x=X,y=Torino_centro_F,colour="Torino centro",linetype="Woman")) + geom_line(aes(x=X,y=Prima_cintura_F,colour="Prima cintura",linetype="Woman"))+
+  geom_line(aes(x=X,y=Seconda_cintura_F,colour="Seconda cintura",linetype="Woman"))+geom_line(aes(x=X,y=Altrove_F,colour="Altrove",linetype="Woman"))+
+  geom_line(aes(x=X,y=Torino_centro_M,colour="Torino centro",linetype="Man")) + geom_line(aes(x=X,y=Prima_cintura_M,colour="Prima cintura",linetype="Man"))+
+  geom_line(aes(x=X,y=Seconda_cintura_M,colour="Seconda cintura",linetype="Man"))+geom_line(aes(x=X,y=Altrove_M,colour="Altrove",linetype="Man"))+labs(colour= "CAP",linetype="Gender")+
+  xlim(0,20)+ylim(0.6,0.95)+
+  labs(x="Number of visits", y="P(renewal)", title="Probability of renewal by the number of visits and Cap")+theme(plot.title = element_text(hjust = 0.5),panel.grid.minor = element_line(size = 0.2,colour='white'),panel.background = element_rect(fill = 'gray90'))+scale_fill_brewer( palette = 9, direction = 1)
+
+
+######## Probability of renewal by subscription cost and Cap
+
+summary(dati$importo)
+importo_seq=seq.int(from=0, to=49, by=1)
+
+
+logit1=(b0 + numero_visite*numero_visite_medio +importo_pagato*importo_seq +eta*eta_media+numero_persone_diverse*numero_persone_diverse_medio+Torino*1 +cintura1*0 +cintura2*0 +genere_M*1 +sconto_d*1+numero_ingressi_condivisi*numero_ingressi_condivisi_medio+indice_medio_betweenness*indice_di_betweenness)
+logit1
+logit2=(b0 + numero_visite*numero_visite_medio +importo_pagato*importo_seq +eta*eta_media+numero_persone_diverse*numero_persone_diverse_medio+Torino*0 +cintura1*1 +cintura2*0 +genere_M*1 +sconto_d*1+numero_ingressi_condivisi*numero_ingressi_condivisi_medio+indice_medio_betweenness*indice_di_betweenness)
+logit2
+logit3=(b0 + numero_visite*numero_visite_medio +importo_pagato*importo_seq+eta*eta_media+numero_persone_diverse*numero_persone_diverse_medio+Torino*0 +cintura1*0 +cintura2*1 +genere_M*1 +sconto_d*1+numero_ingressi_condivisi*numero_ingressi_condivisi_medio+indice_medio_betweenness*indice_di_betweenness)
+logit3
+logit4=(b0 + numero_visite*numero_visite_medio+importo_pagato*importo_seq+eta*eta_media+numero_persone_diverse*numero_persone_diverse_medio+Torino*0 +cintura1*0 +cintura2*0 +genere_M*1 +sconto_d*1+numero_ingressi_condivisi*numero_ingressi_condivisi_medio+indice_medio_betweenness*indice_di_betweenness)
+logit4
+logit5=((b0 + numero_visite*numero_visite_medio +importo_pagato*importo_seq +eta*eta_media+numero_persone_diverse*numero_persone_diverse_medio+Torino*1 +cintura1*0 +cintura2*0 +genere_M*0 +sconto_d*1+numero_ingressi_condivisi*numero_ingressi_condivisi_medio+indice_medio_betweenness*indice_di_betweenness)
+)
+logit5
+logit6=(b0 + numero_visite*numero_visite_medio +importo_pagato*importo_seq +eta*eta_media+numero_persone_diverse*numero_persone_diverse_medio+Torino*0 +cintura1*1 +cintura2*0 +genere_M*0 +sconto_d*1+numero_ingressi_condivisi*numero_ingressi_condivisi_medio+indice_medio_betweenness*indice_di_betweenness)
+logit6
+logit7=(b0  +numero_visite*numero_visite_medio +importo_pagato*importo_seq +eta*eta_media+numero_persone_diverse*numero_persone_diverse_medio+Torino*0 +cintura1* +cintura2*1 +genere_M*0 +sconto_d*1+numero_ingressi_condivisi*numero_ingressi_condivisi_medio+indice_medio_betweenness*indice_di_betweenness)
+logit7
+logit8=(b0  +numero_visite*numero_visite_medio +importo_pagato*importo_seq +eta*eta_media+numero_persone_diverse*numero_persone_diverse_medio+Torino*0 +cintura1*0 +cintura2*0 +genere_M*0 +sconto_d*1+numero_ingressi_condivisi*numero_ingressi_condivisi_medio+indice_medio_betweenness*indice_di_betweenness)
+logit8
+
+
+
+uno_prob=exp(logit1)/(1 + exp(logit1))
+due_prob=exp(logit2)/(1 + exp(logit2))
+tre_prob=exp(logit3)/(1 + exp(logit3))
+quattro_prob=exp(logit4)/(1 + exp(logit4))
+cinque_prob=exp(logit5)/(1 + exp(logit5))
+sei_prob=exp(logit6)/(1 + exp(logit6))
+sette_prob=exp(logit7)/(1 + exp(logit7))
+otto_prob=exp(logit8)/(1 + exp(logit8))
+
+
+plot.logit.data3=data.frame(Torino_centro_M=uno_prob, Prima_cintura_M=due_prob, Seconda_cintura_M=tre_prob, Altrove_M=quattro_prob,
+                            Torino_centro_F=cinque_prob, Prima_cintura_F=sei_prob, Seconda_cintura_F=sette_prob, Altrove_F=otto_prob, X=importo_seq)
+
+ggplot(plot.logit.data3)+geom_line(aes(x=X,y=Torino_centro_F,colour="Torino centro",linetype="Woman")) + geom_line(aes(x=X,y=Prima_cintura_F,colour="Prima cintura",linetype="Woman"))+
+  geom_line(aes(x=X,y=Seconda_cintura_F,colour="Seconda cintura",linetype="Woman"))+geom_line(aes(x=X,y=Altrove_F,colour="Altrove",linetype="Woman"))+
+  geom_line(aes(x=X,y=Torino_centro_M,colour="Torino centro",linetype="Man")) + geom_line(aes(x=X,y=Prima_cintura_M,colour="Prima cintura",linetype="Man"))+
+  geom_line(aes(x=X,y=Seconda_cintura_M,colour="Seconda cintura",linetype="Man"))+geom_line(aes(x=X,y=Altrove_M,colour="Altrove",linetype="Man"))+labs(colour= "CAP",linetype="Gender")+
+  xlim(0,50)+ylim(0.75,0.85)+
+  labs(x="Subscription cost", y="P(renewal)", title="Probability of renewal by subscription cost and Cap.")+theme(plot.title = element_text(hjust = 0.5),panel.grid.minor = element_line(size = 0.2,colour='white'),panel.background = element_rect(fill = 'gray90'))+scale_fill_brewer( palette = 9, direction = 1)
+
+
+########## OTHER POSSIBLE REPRESENTATION OF ODDS RATIOS #########
+
+names(dataset)
+mylogit=glm(si2014  ~ importo +genere_M+ sconto_d + eta+Torino+cintura_1+cintura_2+count+index+numero_persone_diverse+ingressi_condivisi, data = dataset, family = "binomial")
+
+CI=exp(confint(mylogit))
+CI=data.frame(CI)
+
+coeff=exp(coef(mylogit))
+summary(mylogit)
+
+length(coeff)
+
+df=data.frame(yAxis = length(coeff):1, 
+                 boxOdds = (c(coeff[1], 
+                              coeff[2], coeff[3], coeff[4], coeff[5], coeff[6], coeff[7], 
+                              coeff[8],coeff[9],coeff[10],coeff[11],coeff[12])), 
+                 boxCILow = c(CI[1,1], CI[2,1],CI[3,1], CI[4,1],
+                              CI[5,1], CI[6,1], CI[7,1],CI[8,1],CI[9,1],CI[10,1],CI[11,1],CI[12,1]), 
+                 boxCIHigh = c(CI[1,2], CI[2,2], CI[3,2], CI[4,2], 
+                               CI[5,2], CI[6,2], CI[7,2], CI[8,2],CI[9,2],CI[10,2],CI[11,2],CI[12,2])
+)
+
+boxLabels = c("Intercetta ", "Importo pagato per abbonamento","Genere (M) ", "Sconto (dummy) ", "Et\uE0",  "Torino","Cintura_1","Cintura_2","Numero ingressi","Numero medio persone assieme","Numero persone differenti","Numero ingressi condivisi")
+
+
+
+
+grafico_odds=ggplot(df, aes(x = boxOdds, y = df$yAxis))+geom_vline(aes(xintercept = 1), size = .25, linetype = "dashed") +
+  geom_errorbarh(aes(xmax = boxCIHigh, xmin = boxCILow), size = .7, height = .2, color = "gray50") +
+  geom_point(size = 1.5, color = "orange") +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank()) +
+  scale_y_continuous(breaks = df$yAxis, labels = boxLabels) +
+  ylab("") +
+  xlab("Odds ratio") +
+  xlim(0,2.5)+
+  annotate(geom = "text", y =6, x = 1.85, label ="Altrove is the
+category of reference", size = 2.5, hjust = 0, colour = "black")+
+  
+  geom_segment(aes(x = 1, xend =1.2, y= 13, yend=13),
+               arrow=arrow(length=unit(0.2,"cm"))) +
+  geom_segment(aes(x = 1, xend = 0.8, y= 13, yend= 13),
+               arrow=arrow(length=unit(0.2,"cm"))) +
+  annotate("label", x = 1.38, y = 13, label = "Growing effect")+
+  annotate("label", x = 0.60, y =13, label = "Decreasing effect")+
+ggtitle("Interpretation of the odds ratio")+theme(plot.title = element_text(hjust = 0.5))+coord_cartesian(xlim=c(0.3,2.3))
+grafico_odds
+grid.brackets(175, 120, 175,142 , lwd=2, col="red")
+
+
+
+############### PREDICTIVE MODELS##############
+
+
+require(ROCR) 
+
+names(dati)
+dataset=dati[,c("importo", "sconto_d", "eta","count","genere_M","Torino","si2014","costi_entrate","numero_persone_diverse","cintura_1","cintura_2","altrove")]
+dataset=na.omit(dataset)
+
+
+
+ind=sample(2, nrow(dataset), replace = TRUE, prob=c(0.7, 0.3))
+
+trainset = dataset[ind == 1,]
+testset = dataset[ind == 2,]
+
+
+mylogit2=glm(si2014  ~ importo + sconto_d + eta+count+genere_M+Torino+cintura_1+cintura_2+numero_persone_diverse, data = trainset, family = "binomial")
+testset1=testset
+testset1$prob.logit=predict(mylogit2,testset,type='response')
+#####valutazione accurancy su soglia 0.5####
+predclass= ifelse(testset1$prob.logit > 0.5 , 1,0)
+table(predclass,testset$si2014)
+table(testset$si2014)
+#accuracy
+(table(predclass,testset$si2014)[1,1]+table(predclass,testset$si2014)[2,2])/(length(testset1$si2014))
+
+
+#Roc logit
+logit.rocr=prediction(testset1$prob.logit,testset1$si2014)
+logit.perf=performance(logit.rocr , "tpr","fpr")
+
+labels(testset1)
+model1=testset1[order(-testset1[,13]),]
+
+
+## tree ######
+library("party")
+testset2=testset
+ctre=ctree(si2014 ~ importo + sconto_d + eta+count+genere_M+Torino+cintura_1+cintura_2+numero_persone_diverse, data=dataset[ind == 1,])
+
+testset2$tree.prob=unlist(treeresponse(ctre,testset2))
+
+tree.rocr=prediction(testset2$tree.prob,testset2$si2014)
+tree.perf=performance(tree.rocr , "tpr","fpr")
+
+
+model2=testset2[order(-testset2[,13]),]
+
+predclass= ifelse(testset2$tree.prob > 0.5 , 1,0)
+table(predclass,testset2$si2014)
+#accuracy su soglia 0.5#####
+(table(testset2$si2014,predclass)[1,1]+table(testset2$si2014,predclass)[2,2])/(length(testset2$si2014))
+
+
+
+
+######### supervector#######
+
+library("e1071")
+#svm_tune=tune(svm, si2014 ~ ., data = trainset,
+                 #  ranges = list(gamma = seq(0.1,0.8,0.1), cost = (2:6)))
+
+
+testset5=testset
+
+
+x.svm=svm(si2014~importo + sconto_d + eta+count+genere_M+Torino+cintura_1+cintura_2+numero_persone_diverse, data = trainset, cost=3, gamma=0.6,kernel="radial",probability = TRUE)
+summary(x.svm)
+testset5$x.svm.prob <- predict(x.svm, type="prob", newdata=testset5, probability = TRUE)
+summary(testset5$x.svm.prob)
+svm.rocr <- prediction(testset5$x.svm.prob,testset5$si2014)
+svm.perf <- performance(svm.rocr, "tpr","fpr")
+
+model5=testset5[order(-testset5[,13]),]
+predclass= ifelse(testset5$x.svm.prob > 0.5 , 1,0)
+table(predclass,testset5$si2014)
+#accuracy su soglia 0.5#####
+(table(predclass,testset5$si2014)[1,1]+table(predclass,testset5$si2014)[2,2])/dim(testset5)[1]
+
+###################forest#########
+
+testset4=testset
+library("randomForest")
+#bestmtry=tuneRF(trainset, trainset$si2014, stepFactor=1.5, improve=1e-5, ntree=500)
+
+forest.model=randomForest(as.factor(si2014) ~ importo + sconto_d + eta+count+genere_M+Torino+cintura_1+cintura_2+numero_persone_diverse,  
+                             data = dataset[ind == 1,], 
+                             ntree=500, mtry=4,
+                             type="classification")
+
+forest.pred=predict(forest.model, newdata =testset4 , type = "prob")
+testset4$forest.pred=forest.pred[,2]
+predclass= ifelse(testset4$forest.pred > 0.5 , 1,0)
+
+#accuracy su soglia 0.5#####
+(table(predclass,testset4$si2014)[1,1]+table(predclass,testset4$si2014)[2,2])/dim(testset4)[1]
+
+forest.rocr=prediction(testset4$forest.pred,testset4$si2014)
+forest.perf=performance(forest.rocr, "tpr","fpr")
+
+plot(forest.perf, col=2, main="ROC curves comparing classification performance of 3 models")
+
+model4=testset4[order(-testset4[,13]),]
+model4
+
+
+###### Recursive Partitioning
+testset3=testset
+
+library("rpart")
+
+x.rp=rpart( si2014~ importo + sconto_d + eta+count+genere_M+Torino+cintura_1+cintura_2+numero_persone_diverse, data=dataset[ind == 1,])
+testset3$x.rp.prob=predict(x.rp,testset3)
+predclass= ifelse(testset3$x.rp.prob > 0.5 , 1,0)
+#accuracy su soglia 0.5#####
+(table(predclass,testset3$si2014)[1,1]+table(predclass,testset3$si2014)[2,2])/dim(testset3)[1]
+
+x.rp.prob.rocr=prediction(testset3$x.rp.prob,testset3$si2014)
+x.rp.perf=performance(x.rp.prob.rocr, "tpr","fpr")
+
+model3=testset3[order(-testset3[,13]),]
+names(model3)
+
+################ NAIVE BAYES ######
+library("e1071")
+testset6=testset
+
+model=naiveBayes(si2014~ importo + sconto_d + eta+count+genere_M+Torino+cintura_1+cintura_2+numero_persone_diverse, data = dataset[ind == 1,])
+testset6$naiveBayes=predict(model,testset6, type = "raw")[,2]
+naive.rocr=prediction(testset6$naiveBayes,testset6$si2014)
+naive.perf=performance(naive.rocr, "tpr","fpr")
+
+
+#accuracy su soglia 0.5#####
+table(testset6$si2014)
+
+predclass= ifelse(testset6$naiveBayes > 0.5 , 1,0)
+table(predclass,testset6$si2014)
+(table(predclass,testset6$si2014)[1,1]+table(predclass,testset6$si2014)[2,2])/dim(testset6)[1]
+model6=testset6[order(-testset6[,13]),]
+
+############ROC CURVE##################
+
+#svm.perf
+naive.perf
+tree.perf
+forest.perf
+logit.perf
+x.rp.perf
+
+plot(naive.perf, col=1,main="ROC")
+#plot(svm.perf,col=2,add=T)
+plot(tree.perf,col=3,add=T)
+plot(forest.perf,col=4,add=T)
+plot(logit.perf,col=5,add=T)
+plot(x.rp.perf,col=6,add=T)
+abline(a=0, b=1)
+
+
+
+naive.d= data.frame(FPR=naive.perf@x.values[[1]],TPR=naive.perf@y.values[[1]])
+#svm.d= data.frame(FPR=svm.perf@x.values[[1]],TPR=svm.perf@y.values[[1]])
+tree.d= data.frame(FPR=tree.perf@x.values[[1]],TPR=tree.perf@y.values[[1]])
+forest.d= data.frame(FPR=forest.perf@x.values[[1]],TPR=forest.perf@y.values[[1]])
+logit.d= data.frame(FPR=logit.perf@x.values[[1]],TPR=logit.perf@y.values[[1]])
+x.rp.d= data.frame(FPR=x.rp.perf@x.values[[1]],TPR=x.rp.perf@y.values[[1]])
+
+##################ROC CURVE CON GGPLOT2
+
+d = ggplot() +
+  geom_line(data = naive.d, aes(  FPR , TPR,colour="Naive Bayes"))+
+  geom_line(data = svm.d, aes(  FPR , TPR,colour="Support vector machine"))+
+  geom_line(data = tree.d, aes(  FPR , TPR,colour="Conditional inference trees"))+
+  geom_line(data =forest.d, aes(  FPR , TPR,colour="Random forest"))+
+  geom_line(data = logit.d, aes(  FPR , TPR,colour="Logit"))+
+  geom_line(data = x.rp.d, aes(  FPR , TPR,colour="Recursive partitioning"))+
+  annotate("segment", x=0, xend=1,y=0, yend=1)+
+  scale_color_manual(values = c(
+    'Naive Bayes'='dodgerblue4','Support vector machine'='deepskyblue4',
+    'Conditional inference trees'='limegreen','Random forest'='forestgreen','Logit'='red4','Recursive partitioning'='coral4'
+     )) +
+  labs(color = 'Models')+
+  xlab("False Positive Rate (1-Specificity)")+ylab("True Positive Rate (Sensitivity)")+ggtitle("ROC Curve")+theme_wsj()+theme(plot.title = element_text(hjust = 0.5))+theme(axis.title=element_text(size=12))
+d
+
+ggplotly(d)
+
+#######
+table(dataset$si2014)/length(dataset$si2014)
+
+############################ PROFIT CURVE ##################
+#modello1 logit
+#modello2 tree 
+#modello3 Recursive Partitioning
+#model4 forest
+#model5 supervector
+#model6 NAIVE BAYES 
+model1$revenue=((model1$importo-(model1$costi_entrate/2))*model1$si2014)-1
+model2$revenue=((model2$importo-(model2$costi_entrate/2))*model2$si2014)-1
+model3$revenue=((model3$importo-(model3$costi_entrate/2))*model3$si2014)-1
+model4$revenue=((model4$importo-(model4$costi_entrate/2))*model3$si2014)-1
+model5$revenue=((model5$importo-(model5$costi_entrate/2))*model5$si2014)-1
+model6$revenue=((model6$importo-(model6$costi_entrate/2))*model6$si2014)-1
+
+profitti_comulati1=cumsum(model1$revenue)
+profitti_comulati2=cumsum(model2$revenue)
+profitti_comulati3=cumsum(model3$revenue)
+profitti_comulati4=cumsum(model4$revenue)
+#profitti_comulati5=cumsum(model5$revenue)
+profitti_comulati6=cumsum(model6$revenue)
+
+length(model1$revenue)
+length(model2$revenue)
+length(model3$revenue)
+length(model4$revenue)
+length(model5$revenue)
+length(model6$revenue)
+consumatori=seq(from=1/length(model1$importo),to=1,by=1/length(model1$importo))
+data_finale=data.frame(consumatori,profitti_comulati1,profitti_comulati2,profitti_comulati3,profitti_comulati4,#profitti_comulati5,
+                       profitti_comulati6)
+
+library(ggplot2)
+library(ggthemes)
+
+
+profit_line=ggplot(data=data_finale,aes(x=consumatori))+
+  geom_line(aes(y=profitti_comulati1,colour="Logit"))+
+  geom_line(aes(y=profitti_comulati2,colour="Conditional inference trees"))+
+  geom_line(aes(y=profitti_comulati3,colour="Recursive partitioning"))+
+  geom_line(aes(y=profitti_comulati4,colour="Random forest"))+  
+  geom_line(aes(y=profitti_comulati5,colour="svm"))+
+  geom_line(aes(y=profitti_comulati6,colour="Naive Bayes"))+xlab("Percentuale di rispondenti ordinati per probabilit??")+ylab("Profitti cumulati")+labs(colour= "Modelli")+ ggtitle("Profit lines")+
+geom_vline(xintercept = 0.2466943, linetype="dotted",color = "blue", size=0.5)+theme_wsj()+theme(plot.title = element_text(hjust = 0.5))+theme(axis.title=element_text(size=12))
+
+
+profit_line
+ggplotly(profit_line)
+
+
+model1$pofitti_cumulati1=profitti_comulati1
+model2$pofitti_cumulati2=profitti_comulati2
+model3$pofitti_cumulati3=profitti_comulati3
+model4$pofitti_cumulati4=profitti_comulati4
+#model5$pofitti_cumulati5=profitti_comulati5
+model6$pofitti_cumulati6=profitti_comulati6
+
+
+model1[5000,15]
+model2[5000,15]
+model3[5000,15]
+model4[5000,15]#miglior modello 4.
+model6[5000,15]
+
+############################ ISOPROFIT CON EXPETCTED VALUE###########
+
+model1=model1[,-dim(model1)[2]]
+
+model2=model2[,-dim(model2)[2]]
+model3=model3[,-dim(model3)[2]]
+model4=model4[,-dim(model4)[2]]
+#model5=model5[,-dim(model5)[2]]
+model6=model6[,-dim(model6)[2]]
+
+model1$exp=((model1$importo-(model1$costi_entrate/2)))*(model1$prob.logit)-1
+model2$exp=((model2$importo-(model2$costi_entrate/2)))*(model2$tree.prob)-1
+model3$exp=((model3$importo-(model3$costi_entrate/2)))*(model3$x.rp.prob)-1
+model4$exp=((model4$importo-(model4$costi_entrate/2)))*(model4$forest.pred)-1
+#model5$exp=((model5$importo-(model5$costi_entrate/2)))*(model5$x.svm.prob)-1
+model6$exp=((model6$importo-(model6$costi_entrate/2)))*(model6$naiveBayes)-1     
+                                                                          
+
+model1=model1[order(-model1$exp),]
+model2=model2[order(-model2$exp),]
+model3=model3[order(-model3$exp),]
+model4=model4[order(-model4$exp),]
+#model5=model5[order(-model5$exp),]
+model6=model6[order(-model6$exp),]
+                                                                          
+                                                                 
+profitti_comulati1=cumsum(model1$revenue)
+profitti_comulati2=cumsum(model2$revenue)
+profitti_comulati3=cumsum(model3$revenue)
+profitti_comulati4=cumsum(model4$revenue)
+#profitti_comulati5=cumsum(model5$revenue)
+profitti_comulati6=cumsum(model6$revenue)
+                                                                          
+                                                                        
+consumatori=seq(from=1/length(model1$importo),to=1,by=1/length(model1$importo))
+data_finale=data.frame(consumatori,profitti_comulati1,profitti_comulati2,profitti_comulati3,profitti_comulati4,profitti_comulati5,
+                       profitti_comulati6)
+
+                                                                        
+library(ggplot2)
+library(ggthemes)
+
+pp=ggplot(data=data_finale,aes(consumatori))+geom_line(aes(y=profitti_comulati1,colour="Logit"))+geom_line(aes(y=profitti_comulati2,colour="Conditional inference trees"))+geom_line(aes(y=profitti_comulati3,colour="Recursive partitioning"))+geom_line(aes(y=profitti_comulati4,colour="Random forest"))+geom_line(aes(y=profitti_comulati5,colour="svm"))+
+  geom_line(aes(y=profitti_comulati6,colour="Naive Bayes"))+labs(colour= "Models")+geom_vline(aes(xintercept = 0.2466943,linetype= "Budget constraint"),color="red", size=0.5)+scale_linetype_manual(name = "Constraint",values = c("Budget constraint" = "dotted"))+
+xlab("Percentage of subscribers ordered by expected profits")+ylab("Cumulative profits")+ ggtitle("Profit lines")
+
+profit_line=pp+theme_wsj()+scale_y_continuous(labels=scales::comma,breaks=seq(0,400000,by=50000),limits=c(0,300000) )+theme(plot.title = element_text(hjust = 0.5))+theme(axis.title=element_text(size=12))
+
+profit_line
+
+data_finale[5000,]
+data_finale[5000,2]
+data_finale[5000,3]
+data_finale[5000,4]
+data_finale[5000,5]#miglior modello 4, Random Forest.
+data_finale[5000,6]
+data_finale[5000,7]                                                                        
+            
+
+
+
+#################
+
+class(dati_completi$data_inizio)
+dati_completi$data_inizio=as.Date(as.character(dati_completi$data_inizio),format="%d/%m/%Y")
+dati_completi
+dati_completi$data_finale=as.Date("2013-12-31")
+dati_completi$diff_date=difftime(dati_completi$data_finale,dati_completi$data_inizio, units = c("days"))
+
+
+dati_giorni_ribaso=dati_completi %>%
+  group_by(codcliente) %>%
+  select(-(data_inizio:data_finale)) %>%
+  filter (! duplicated(codcliente))
+
+dataset=merge(dati,dati_giorni_ribaso, by="codcliente",all.x=T)
+labels(dataset)
+
+dataset=dataset[,c("importo", "sconto_d", "eta","count","genere_M","Torino","si2014","costi_entrate","numero_persone_diverse","cintura_1","cintura_2","altrove","diff_date")]
+dataset=na.omit(dataset)
+
+
+dataset$diff_date=as.numeric(as.character(dataset$diff_date))
+
+
+ind=sample(2, nrow(dataset), replace = TRUE, prob=c(0.7, 0.3))
+
+trainset = dataset[ind == 1,]
+testset = dataset[ind == 2,]
+
+
+
+mylogit2=glm(si2014  ~ importo + sconto_d + eta+count+genere_M+Torino+cintura_1+cintura_2+numero_persone_diverse, data = trainset, family = "binomial")
+testset1=testset
+testset1$prob.logit=predict(mylogit2,testset,type='response')
+#####valutazione accuracy####
+predclass= ifelse(testset1$prob.logit > 0.5 , 1,0)
+table(testset$si2014,predclass)
+#accuracy
+(table(testset1$si2014,predclass)[1,1]+table(testset1$si2014,predclass)[2,2])/(length(testset1$si2014))
+
+model1=testset1
+labels(model1)
+model1=testset1[order(-testset1[,14]),]
+
+
+library("party")
+testset2=testset
+ctre=ctree(si2014 ~ importo + sconto_d + eta+count+genere_M+Torino+cintura_1+cintura_2+numero_persone_diverse, data=dataset[ind == 1,])
+
+testset2$tree.prob=unlist(treeresponse(ctre,testset2))
+
+model2=testset2
+
+#accuracy
+predclass= ifelse(testset2$tree.prob > 0.5 , 1,0)
+table(testset2$si2014,predclass)
+(table(testset2$si2014,predclass)[1,1]+table(testset2$si2014,predclass)[2,2])/(length(testset2$si2014))
+model2=testset2[order(-testset2[,14]),]
+
+
+#########supervector#######
+
+library("e1071")
+#svm_tune=tune(svm, si2014 ~ ., data = trainset,
+              #ranges = list(gamma = seq(0.1,0.8,0.1), cost = (2:6)))
+
+
+testset5=testset
+
+
+x.svm=svm(si2014~importo + sconto_d + eta+count+genere_M+Torino+cintura_1+cintura_2+numero_persone_diverse, data = trainset, cost=3, gamma=0.6,kernel="radial",probability = TRUE)
+summary(x.svm)
+testset5$x.svm.prob <- predict(x.svm, type="prob", newdata=testset5, probability = TRUE)
+summary(testset5$x.svm.prob)
+model5=testset5
+################### forest#########
+
+testset4=testset
+library("randomForest")
+#bestmtry=tuneRF(trainset, trainset$si2014, stepFactor=1.5, improve=1e-5, ntree=500)
+
+forest.model=randomForest(as.factor(si2014) ~ importo + sconto_d + eta+count+genere_M+Torino+cintura_1+cintura_2+numero_persone_diverse,  
+                             data = dataset[ind == 1,], 
+                             ntree=500, mtry=6,
+                             type="classification")
+
+
+forest.pred=predict(forest.model, newdata =testset4 , type = "prob")
+testset4$forest.pred=forest.pred[,2]
+predclass= ifelse(testset4$forest.pred > 0.5 , 1,0)
+model4=testset4[order(-testset4[,14]),]
+
+#accuracy#####
+(table(predclass,testset4$si2014)[1,1]+table(predclass,testset4$si2014)[2,2])/dim(testset4)[1]
+
+
+
+
+######Recursive Partitioning
+
+testset3=testset
+
+library("rpart")
+
+x.rp=rpart( si2014~ importo + sconto_d + eta+count+genere_M+Torino+cintura_1+cintura_2+numero_persone_diverse, data=dataset[ind == 1,])
+testset3$x.rp.prob=predict(x.rp,testset3)
+predclass= ifelse(testset3$x.rp.prob > 0.5 , 1,0)
+#accurancy#####
+(table(predclass,testset3$si2014)[1,1]+table(predclass,testset3$si2014)[2,2])/dim(testset3)[1]
+
+model3=testset3
+model3=testset3[order(-testset3[,14]),]
+
+################NAIVE BAYES ######
+library("e1071")
+testset6=testset
+
+model=naiveBayes(si2014~importo + sconto_d + eta+count+genere_M+Torino+cintura_1+cintura_2+numero_persone_diverse, data = dataset[ind == 1,])
+testset6$naiveBayes=predict(model,testset6, type = "raw")[,2]
+
+##accuracy##
+predclass= ifelse(testset6$naiveBayes > 0.5 , 1,0)
+(table(predclass,testset6$si2014)[1,1]+table(predclass,testset6$si2014)[2,2])/dim(testset6)[1]
+model6=testset6
+model6=testset6[order(-testset6[,14]),]
+
+##########################################
+model1$costi_entrate_ribasati=(model1$costi_entrate/model1$diff_date)*365
+model2$costi_entrate_ribasati=(model2$costi_entrate/model2$diff_date)*365
+model3$costi_entrate_ribasati=(model3$costi_entrate/model3$diff_date)*365
+model4$costi_entrate_ribasati=(model4$costi_entrate/model4$diff_date)*365
+#model5$costi_entrate_ribasati=(model5$costi_entrate/model5$diff_date)*365
+model6$costi_entrate_ribasati=(model6$costi_entrate/model6$diff_date)*365
+
+
+model1$exp=((model1$importo-(model1$costi_entrate_ribasati/2)))*(model1$prob.logit)-1
+model2$exp=((model2$importo-(model2$costi_entrate_ribasati/2)))*(model2$tree.prob)-1
+model3$exp=((model3$importo-(model3$costi_entrate_ribasati/2)))*(model3$x.rp.prob)-1
+model4$exp=((model4$importo-(model4$costi_entrate_ribasati/2)))*(model4$forest.pred)-1
+#model5$exp=((model5$importo-(model5$costi_entrate_ribasati/2)))*p()-1
+model6$exp=((model6$importo-(model6$costi_entrate_ribasati/2)))*(model6$naiveBayes)-1     
+
+
+model1$revenue=((model1$importo-(model1$costi_entrate_ribasati/2))*model1$si2014)-1
+model2$revenue=((model2$importo-(model2$costi_entrate_ribasati/2))*model2$si2014)-1
+model3$revenue=((model3$importo-(model3$costi_entrate_ribasati/2))*model3$si2014)-1
+model4$revenue=((model4$importo-(model4$costi_entrate_ribasati/2))*model3$si2014)-1
+#model5$revenue=((model5$importo-(model5$costi_entrate_ribasati/2))*model5$si2014)-1
+model6$revenue=((model6$importo-(model6$costi_entrate_ribasati/2))*model6$si2014)-1
+
+
+model1=model1[order(-model1$exp),]
+model2=model2[order(-model2$exp),]
+model3=model3[order(-model3$exp),]
+model4=model4[order(-model4$exp),]
+#model5=model5[order(-model5$exp),]
+model6=model6[order(-model6$exp),]
+
+
+profitti_comulati1=cumsum(model1$revenue)
+profitti_comulati2=cumsum(model2$revenue)
+profitti_comulati3=cumsum(model3$revenue)
+profitti_comulati4=cumsum(model4$revenue)
+#profitti_comulati5=cumsum(model5$revenue)
+profitti_comulati6=cumsum(model6$revenue)
+
+
+consumatori=seq(from=1/length(model1$importo),to=1,by=1/length(model1$importo))
+data_finale=data.frame(consumatori,profitti_comulati1,profitti_comulati2,profitti_comulati3,profitti_comulati4,#profitti_comulati5,
+                       profitti_comulati6)
+
+
+library(ggplot2)
+library(ggthemes)
+
+pp=ggplot(data=data_finale,aes(consumatori))+geom_line(aes(y=profitti_comulati1,colour="Logit"))+geom_line(aes(y=profitti_comulati2,colour="Conditional inference trees"))+geom_line(aes(y=profitti_comulati3,colour="Recursive partitioning"))+geom_line(aes(y=profitti_comulati4,colour="Random forest"))+#geom_line(aes(y=profitti_comulati5,colour="svm"))+
+  geom_line(aes(y=profitti_comulati6,colour="Naive Bayes"))+labs(colour= "Models")+geom_vline(aes(xintercept = 0.2466943,linetype= "Budget constraint"),color="red", size=0.5)+scale_linetype_manual(name = "Constraint",values = c("Budget constraint" = "dotted"))+
+  xlab("Percentage of respondents with greater probability")+ylab("Cumulative profit")+ ggtitle("Profit lines with annualized costs")
+
+profit_line=pp+theme_wsj()+scale_y_continuous(labels=scales::comma,breaks=seq(0,400000,by=50000),limits=c(0,300000) )+theme(plot.title = element_text(hjust = 0.5))
+
+profit_line
+ggplotly(profit_line)
+
+
+data_finale[5000,2]
+data_finale[5000,3]
+data_finale[5000,4]
+data_finale[5000,5]
+data_finale[5000,6]
+#data_finale[5000,7]
+
+
+
+
+
+
